@@ -34,6 +34,7 @@ public class MainFrame extends javax.swing.JFrame {
     public MainFrame() {
         initComponents();
         PropertiesLoader.loadPropertyFile();
+        setStatusLabel("");
     }
 
     /** This method is called from within the constructor to
@@ -46,7 +47,7 @@ public class MainFrame extends javax.swing.JFrame {
     private void initComponents() {
 
         bootstrapTextField = new javax.swing.JTextField();
-        portTextField = new javax.swing.JTextField();
+        localPortTextField = new javax.swing.JTextField();
         connectButton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
@@ -58,6 +59,8 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         valueTextField = new javax.swing.JTextField();
+        jSeparator2 = new javax.swing.JSeparator();
+        statusLable = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -68,10 +71,10 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
-        portTextField.setText("8081");
-        portTextField.addActionListener(new java.awt.event.ActionListener() {
+        localPortTextField.setText("8081");
+        localPortTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                portTextFieldActionPerformed(evt);
+                localPortTextFieldActionPerformed(evt);
             }
         });
 
@@ -120,6 +123,8 @@ public class MainFrame extends javax.swing.JFrame {
 
         valueTextField.setText("value");
 
+        statusLable.setText(".");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -131,27 +136,29 @@ public class MainFrame extends javax.swing.JFrame {
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(jLabel3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 60, Short.MAX_VALUE)
-                        .addComponent(keyTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 360, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(keyTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 356, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(insertButton, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel1)
                             .addComponent(jLabel2))
                         .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(portTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 362, Short.MAX_VALUE)
-                            .addComponent(bootstrapTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 362, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(localPortTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 358, Short.MAX_VALUE)
+                            .addComponent(bootstrapTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 358, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addComponent(initButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(connectButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(jLabel4)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 52, Short.MAX_VALUE)
-                        .addComponent(valueTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 360, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(retrieveButton, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(valueTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 356, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(retrieveButton, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(statusLable)
+                    .addComponent(jSeparator2, javax.swing.GroupLayout.DEFAULT_SIZE, 531, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -160,7 +167,7 @@ public class MainFrame extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(initButton, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(portTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(localPortTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -180,7 +187,11 @@ public class MainFrame extends javax.swing.JFrame {
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jLabel4)
                         .addComponent(valueTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(202, 202, 202))
+                .addGap(181, 181, 181)
+                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(statusLable)
+                .addContainerGap())
         );
 
         pack();
@@ -195,7 +206,7 @@ public class MainFrame extends javax.swing.JFrame {
         String protocol = URL.KNOWN_PROTOCOLS.get(URL.SOCKET_PROTOCOL);
 
         URL localURL = null;
-        String port = this.portTextField.getText();
+        String port = this.localPortTextField.getText();
         try {
             localURL = new URL( protocol + "://localhost:"+port+"/");
         } catch ( MalformedURLException e){
@@ -205,17 +216,21 @@ public class MainFrame extends javax.swing.JFrame {
         chord = new ChordImpl();
         try {
             chord.create ( localURL );
+            this.setStatusLabel("Chord created successfully.");
+            this.disableConnectionComponents();
         } catch ( ServiceException e) {
+            this.setStatusLabel("Chord creation failed.");
             throw new RuntimeException (" Could not create DHT !", e);
         }
 
+        
     }//GEN-LAST:event_initButtonActionPerformed
 
     private void connectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_connectButtonActionPerformed
 
         String protocol = URL.KNOWN_PROTOCOLS.get(URL.SOCKET_PROTOCOL);
 
-        String port = this.portTextField.getText();
+        String port = this.localPortTextField.getText();
         URL localURL = null;
         try {
             localURL = new URL( protocol + "://localhost:"+port+"/");
@@ -232,22 +247,29 @@ public class MainFrame extends javax.swing.JFrame {
 
         try {
             chord.join(bootstrapURL);
+            this.setStatusLabel("Join done.");
+        this.disableConnectionComponents();
         } catch (ServiceException ex) {
+            this.setStatusLabel("Join failed.");
             Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        /*
-        
-        System.out.println("Waiting for key one to be set...");
 
-        try {
-            Thread.sleep(10000);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(Main3.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        
-        */
+
+
     }//GEN-LAST:event_connectButtonActionPerformed
+
+
+    public void setStatusLabel(String status){
+        this.statusLable.setText(status);
+    }
+
+    public void disableConnectionComponents(){
+        this.initButton.setEnabled(false);
+        this.connectButton.setEnabled(false);
+        this.bootstrapTextField.setEnabled(false);
+        this.localPortTextField.setEnabled(false);
+    }
 
     private void keyTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_keyTextFieldActionPerformed
         // TODO add your handling code here:
@@ -281,9 +303,9 @@ public class MainFrame extends javax.swing.JFrame {
         this.valueTextField.setText(value);
     }//GEN-LAST:event_retrieveButtonActionPerformed
 
-    private void portTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_portTextFieldActionPerformed
+    private void localPortTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_localPortTextFieldActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_portTextFieldActionPerformed
+    }//GEN-LAST:event_localPortTextFieldActionPerformed
 
     /**
     * @param args the command line arguments
@@ -306,9 +328,11 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JSeparator jSeparator2;
     private javax.swing.JTextField keyTextField;
-    private javax.swing.JTextField portTextField;
+    private javax.swing.JTextField localPortTextField;
     private javax.swing.JButton retrieveButton;
+    private javax.swing.JLabel statusLable;
     private javax.swing.JTextField valueTextField;
     // End of variables declaration//GEN-END:variables
 
