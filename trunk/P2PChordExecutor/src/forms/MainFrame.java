@@ -68,7 +68,7 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
-        portTextField.setText("1234");
+        portTextField.setText("8081");
         portTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 portTextFieldActionPerformed(evt);
@@ -221,7 +221,7 @@ public class MainFrame extends javax.swing.JFrame {
             localURL = new URL( protocol + "://localhost:"+port+"/");
         } catch ( MalformedURLException e){ throw new RuntimeException (e);}
 
-        Chord chord = new ChordImpl();
+        chord = new ChordImpl();
         chord.setURL(localURL);
 
         URL bootstrapURL = null;
@@ -266,6 +266,7 @@ public class MainFrame extends javax.swing.JFrame {
     private void retrieveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_retrieveButtonActionPerformed
         String key = this.keyTextField.getText();
         Set<Serializable> set = null;
+        System.out.println("Trying to get key " + key);
         try {
             set = chord.retrieve(new StringKey(key));
         } catch (ServiceException ex) {
@@ -275,8 +276,7 @@ public class MainFrame extends javax.swing.JFrame {
         String value = "";
         Iterator<Serializable> i = set.iterator();
         while(i.hasNext()){
-            Serializable ser = i.next();
-            value.concat(ser.toString());
+            value = i.next().toString();
         }
         this.valueTextField.setText(value);
     }//GEN-LAST:event_retrieveButtonActionPerformed
