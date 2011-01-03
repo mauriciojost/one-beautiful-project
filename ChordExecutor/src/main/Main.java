@@ -12,8 +12,9 @@ public class Main {
 
         String protocol = URL.KNOWN_PROTOCOLS.get(URL.SOCKET_PROTOCOL);
         URL localURL = null;
+        String port = "8080";
         try {
-            localURL = new URL( protocol + "://localhost:8080/");
+            localURL = new URL( protocol + "://localhost:"+port+"/");
         } catch ( MalformedURLException e){
             throw new RuntimeException (e);
         }
@@ -24,6 +25,7 @@ public class Main {
         } catch ( ServiceException e) {
             throw new RuntimeException (" Could not create DHT !", e);
         }
+
 
         
     }
