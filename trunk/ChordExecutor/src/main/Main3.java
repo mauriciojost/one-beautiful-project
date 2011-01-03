@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Main2 {
+public class Main3 {
 
     public static void main ( String [] args ) {
         PropertiesLoader.loadPropertyFile();
@@ -19,34 +19,41 @@ public class Main2 {
 
         URL localURL = null;
         try {
-            localURL = new URL( protocol + "://localhost:8081/");
+            localURL = new URL( protocol + "://localhost:8082/");
         } catch ( MalformedURLException e){ throw new RuntimeException (e);}
 
         Chord chord = new ChordImpl();
         chord.setURL(localURL);
 
-        String bootstrapName = "localhost:8080";
         URL bootstrapURL = null;
         try {
-            bootstrapURL = new URL( protocol + "://"+bootstrapName+"/");
+            bootstrapURL = new URL( protocol + "://localhost:8080/");
         } catch ( MalformedURLException e){ throw new RuntimeException (e);}
 
         try {
             chord.join(bootstrapURL);
         } catch (ServiceException ex) {
-            Logger.getLogger(Main2.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Main3.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
-            chord.insert(new StringKey("one key"), "one value");
+            chord.insert(new StringKey("two key"), "two value");
         } catch (ServiceException ex) {
-            Logger.getLogger(Main2.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Main3.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        System.out.println("Waiting for key one to be set...");
+
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Main3.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         Set<Serializable> set = null;
         try {
             set = chord.retrieve(new StringKey("one key"));
         } catch (ServiceException ex) {
-            Logger.getLogger(Main2.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Main3.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         Iterator i = set.iterator();
