@@ -11,30 +11,61 @@
 
 package forms;
 
+
+import javax.swing.plaf.basic.BasicLookAndFeel;
+import javax.swing.plaf.metal.MetalLookAndFeel;
+import javax.swing.plaf.synth.SynthLookAndFeel;
+import com.sun.java.swing.plaf.motif.MotifLookAndFeel;
+import com.sun.java.swing.plaf.windows.WindowsClassicLookAndFeel;
+import com.sun.java.swing.plaf.windows.WindowsLookAndFeel;
+
 import de.uniba.wiai.lspi.chord.data.*;
 import de.uniba.wiai.lspi.chord.service.*;
 import de.uniba.wiai.lspi.chord.service.impl.*;
+import java.awt.Toolkit;
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.UIManager;
+
 import main.*;
 
 /**
  *
  * @author Mauricio
  */
-public class MainFrame extends javax.swing.JFrame {
-    
-    private Chord chord = null;
+public class MainFrame extends javax.swing.JFrame implements PeriodicTask {
+    private final int reportUpgradeInterval = 1000;
+    private ChordImplExtended chord = null;
 
     /** Creates new form MainFrame */
     public MainFrame() {
         initComponents();
         PropertiesLoader.loadPropertyFile();
         setStatusLabel("");
+        /* Look & Feels. */
+
+//        BasicLookAndFeel met = new MetalLookAndFeel();
+//        BasicLookAndFeel winC = new WindowsClassicLookAndFeel();
+//        BasicLookAndFeel syn = new SynthLookAndFeel();
+//        BasicLookAndFeel mot = new MotifLookAndFeel();
+//        BasicLookAndFeel win = new WindowsLookAndFeel();
+//
+//        /* Change Look & Feel. */
+//        try{
+//            UIManager.setLookAndFeel(winC);
+//        } catch (Exception ex){
+//            ex.printStackTrace();
+//        }
+        this.setLocation((                      /* Put the window in the center of the screeen. */
+            Toolkit.getDefaultToolkit().getScreenSize().
+            width-this.getSize().width)/2,
+            (Toolkit.getDefaultToolkit().getScreenSize().
+            height-this.getSize().height)/2);
+
     }
 
     /** This method is called from within the constructor to
@@ -61,8 +92,13 @@ public class MainFrame extends javax.swing.JFrame {
         valueTextField = new javax.swing.JTextField();
         jSeparator2 = new javax.swing.JSeparator();
         statusLable = new javax.swing.JLabel();
+        jSeparator3 = new javax.swing.JSeparator();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        reportTextArea = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Chord's Job Executor");
+        setResizable(false);
 
         bootstrapTextField.setText("localhost:8080");
         bootstrapTextField.addActionListener(new java.awt.event.ActionListener() {
@@ -125,6 +161,15 @@ public class MainFrame extends javax.swing.JFrame {
 
         statusLable.setText(".");
 
+        reportTextArea.setBackground(new java.awt.Color(0, 0, 0));
+        reportTextArea.setColumns(20);
+        reportTextArea.setForeground(new java.awt.Color(255, 255, 255));
+        reportTextArea.setLineWrap(true);
+        reportTextArea.setRows(5);
+        reportTextArea.setText("Report...");
+        reportTextArea.setWrapStyleWord(true);
+        jScrollPane1.setViewportView(reportTextArea);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -132,44 +177,53 @@ public class MainFrame extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 531, Short.MAX_VALUE)
                     .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 531, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(jLabel3)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 60, Short.MAX_VALUE)
-                        .addComponent(keyTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 356, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(insertButton, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel1)
                             .addComponent(jLabel2))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(localPortTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 358, Short.MAX_VALUE)
-                            .addComponent(bootstrapTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 358, Short.MAX_VALUE))
+                        .addGap(28, 28, 28)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(localPortTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 354, Short.MAX_VALUE)
+                            .addComponent(bootstrapTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 354, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(initButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(initButton, 0, 0, Short.MAX_VALUE)
                             .addComponent(connectButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(jLabel4)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 52, Short.MAX_VALUE)
-                        .addComponent(valueTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 356, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(retrieveButton, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(statusLable)
-                    .addComponent(jSeparator2, javax.swing.GroupLayout.DEFAULT_SIZE, 531, Short.MAX_VALUE))
+                    .addComponent(jSeparator2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 531, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel4)
+                            .addComponent(jLabel3))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 60, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(valueTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 356, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(keyTextField)
+                                .addGap(10, 10, 10)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(insertButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(retrieveButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(jSeparator3, javax.swing.GroupLayout.DEFAULT_SIZE, 531, Short.MAX_VALUE)
+                    .addContainerGap()))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE, false)
                     .addComponent(initButton, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(localPortTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(7, 7, 7)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(connectButton, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1)
@@ -183,15 +237,22 @@ public class MainFrame extends javax.swing.JFrame {
                     .addComponent(jLabel3))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(retrieveButton)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jLabel4)
-                        .addComponent(valueTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(181, 181, 181)
+                        .addComponent(valueTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(retrieveButton))
+                .addGap(18, 18, 18)
                 .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
                 .addComponent(statusLable)
                 .addContainerGap())
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                    .addContainerGap(365, Short.MAX_VALUE)
+                    .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGap(21, 21, 21)))
         );
 
         pack();
@@ -213,11 +274,11 @@ public class MainFrame extends javax.swing.JFrame {
             throw new RuntimeException (e);
         }
 
-        chord = new ChordImpl();
+        chord = new ChordImplExtended();
         try {
             chord.create ( localURL );
             this.setStatusLabel("Chord created successfully.");
-            this.disableConnectionComponents();
+            this.connectionToChordInstanceDone();
         } catch ( ServiceException e) {
             this.setStatusLabel("Chord creation failed.");
             throw new RuntimeException (" Could not create DHT !", e);
@@ -236,7 +297,7 @@ public class MainFrame extends javax.swing.JFrame {
             localURL = new URL( protocol + "://localhost:"+port+"/");
         } catch ( MalformedURLException e){ throw new RuntimeException (e);}
 
-        chord = new ChordImpl();
+        chord = new ChordImplExtended();
         chord.setURL(localURL);
 
         URL bootstrapURL = null;
@@ -248,7 +309,7 @@ public class MainFrame extends javax.swing.JFrame {
         try {
             chord.join(bootstrapURL);
             this.setStatusLabel("Join done.");
-        this.disableConnectionComponents();
+        this.connectionToChordInstanceDone();
         } catch (ServiceException ex) {
             this.setStatusLabel("Join failed.");
             Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
@@ -264,11 +325,14 @@ public class MainFrame extends javax.swing.JFrame {
         this.statusLable.setText(status);
     }
 
-    public void disableConnectionComponents(){
+    public void connectionToChordInstanceDone(){
         this.initButton.setEnabled(false);
         this.connectButton.setEnabled(false);
         this.bootstrapTextField.setEnabled(false);
         this.localPortTextField.setEnabled(false);
+
+        Timer timer = new Timer(this, reportUpgradeInterval);
+        timer.start();
     }
 
     private void keyTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_keyTextFieldActionPerformed
@@ -278,23 +342,16 @@ public class MainFrame extends javax.swing.JFrame {
     private void insertButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_insertButtonActionPerformed
         String key = this.keyTextField.getText();
         String value = this.valueTextField.getText();
-        try {
-            chord.insert(new StringKey(key), value);
-        } catch (ServiceException ex) {
-            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        chord.insert(new StringKey(key), value);
     }//GEN-LAST:event_insertButtonActionPerformed
 
     private void retrieveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_retrieveButtonActionPerformed
         String key = this.keyTextField.getText();
         Set<Serializable> set = null;
         System.out.println("Trying to get key " + key);
-        try {
-            set = chord.retrieve(new StringKey(key));
-        } catch (ServiceException ex) {
-            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
-        }
 
+        set = chord.retrieve(new StringKey(key));
+        
         String value = "";
         Iterator<Serializable> i = set.iterator();
         while(i.hasNext()){
@@ -327,13 +384,21 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
+    private javax.swing.JSeparator jSeparator3;
     private javax.swing.JTextField keyTextField;
     private javax.swing.JTextField localPortTextField;
+    private javax.swing.JTextArea reportTextArea;
     private javax.swing.JButton retrieveButton;
     private javax.swing.JLabel statusLable;
     private javax.swing.JTextField valueTextField;
     // End of variables declaration//GEN-END:variables
+
+    public void periodicTask() {
+        /* Update report text area. */
+        this.reportTextArea.setText(this.chord.printEntries());
+    }
 
 }
