@@ -23,12 +23,15 @@ import de.uniba.wiai.lspi.chord.data.*;
 import de.uniba.wiai.lspi.chord.service.*;
 import de.uniba.wiai.lspi.chord.service.impl.*;
 import java.awt.Toolkit;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFrame;
 import javax.swing.UIManager;
 
 import main.*;
@@ -66,6 +69,18 @@ public class MainFrame extends javax.swing.JFrame implements PeriodicTask {
             (Toolkit.getDefaultToolkit().getScreenSize().
             height-this.getSize().height)/2);
 
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                closeApplication();
+            }
+        });
+    }
+
+
+    public void closeApplication(){
+        if (chord!=null)
+            chord.leave();
     }
 
     /** This method is called from within the constructor to
@@ -399,8 +414,12 @@ public class MainFrame extends javax.swing.JFrame implements PeriodicTask {
 
     public void periodicTask() {
         /* Update report text area. */
+        try{
         this.reportTextArea.setText(chord.printMyEntries());
         System.out.println(chord.printEntries());
+        }catch(Exception e){
+            System.out.println("Trying to use chord once it was freed: avoided.");
+        }
     }
 
 }
