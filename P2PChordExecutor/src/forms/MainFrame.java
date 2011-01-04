@@ -309,7 +309,7 @@ public class MainFrame extends javax.swing.JFrame implements PeriodicTask {
         try {
             chord.join(bootstrapURL);
             this.setStatusLabel("Join done.");
-        this.connectionToChordInstanceDone();
+            this.connectionToChordInstanceDone();
         } catch (ServiceException ex) {
             this.setStatusLabel("Join failed.");
             Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
@@ -331,6 +331,7 @@ public class MainFrame extends javax.swing.JFrame implements PeriodicTask {
         this.bootstrapTextField.setEnabled(false);
         this.localPortTextField.setEnabled(false);
 
+        this.setTitle(this.getTitle() + " - " + chord.getID());
         Timer timer = new Timer(this, reportUpgradeInterval);
         timer.start();
     }
@@ -398,7 +399,8 @@ public class MainFrame extends javax.swing.JFrame implements PeriodicTask {
 
     public void periodicTask() {
         /* Update report text area. */
-        this.reportTextArea.setText(this.chord.printEntries());
+        this.reportTextArea.setText(chord.printMyEntries());
+        System.out.println(chord.printEntries());
     }
 
 }
