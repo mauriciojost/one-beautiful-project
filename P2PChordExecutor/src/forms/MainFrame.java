@@ -12,13 +12,6 @@
 package forms;
 
 
-import javax.swing.plaf.basic.BasicLookAndFeel;
-import javax.swing.plaf.metal.MetalLookAndFeel;
-import javax.swing.plaf.synth.SynthLookAndFeel;
-import com.sun.java.swing.plaf.motif.MotifLookAndFeel;
-import com.sun.java.swing.plaf.windows.WindowsClassicLookAndFeel;
-import com.sun.java.swing.plaf.windows.WindowsLookAndFeel;
-
 import de.uniba.wiai.lspi.chord.data.*;
 import de.uniba.wiai.lspi.chord.service.*;
 import de.uniba.wiai.lspi.chord.service.impl.*;
@@ -31,8 +24,6 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JFrame;
-import javax.swing.JToggleButton;
 import javax.swing.UIManager;
 
 import main.*;
@@ -47,11 +38,8 @@ public class MainFrame extends javax.swing.JFrame implements EntriesEventListene
     static{
         try  {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            //UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-            //UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
-            //UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
         }catch  (Exception e) {
-
+            e.printStackTrace();
         }
    }
    
@@ -100,7 +88,7 @@ public class MainFrame extends javax.swing.JFrame implements EntriesEventListene
         jLabel2 = new javax.swing.JLabel();
         initButton = new javax.swing.JButton();
         debuGinsertButton = new javax.swing.JButton();
-        debuGretrieveButton = new javax.swing.JButton();
+        debuGremoveButton = new javax.swing.JButton();
         debuGkeyTextField = new javax.swing.JTextField();
         debugKeyLabel = new javax.swing.JLabel();
         debuGvalueLabel = new javax.swing.JLabel();
@@ -109,6 +97,7 @@ public class MainFrame extends javax.swing.JFrame implements EntriesEventListene
         jScrollPane1 = new javax.swing.JScrollPane();
         debuGreportTextArea = new javax.swing.JTextArea();
         showDebugButton = new javax.swing.JToggleButton();
+        continueButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Chord's Job Executor");
@@ -153,10 +142,10 @@ public class MainFrame extends javax.swing.JFrame implements EntriesEventListene
             }
         });
 
-        debuGretrieveButton.setText("Retrieve");
-        debuGretrieveButton.addActionListener(new java.awt.event.ActionListener() {
+        debuGremoveButton.setText("Remove");
+        debuGremoveButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                debuGretrieveButtonActionPerformed(evt);
+                debuGremoveButtonActionPerformed(evt);
             }
         });
 
@@ -191,6 +180,13 @@ public class MainFrame extends javax.swing.JFrame implements EntriesEventListene
             }
         });
 
+        continueButton.setText("Next");
+        continueButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                continueButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -201,24 +197,20 @@ public class MainFrame extends javax.swing.JFrame implements EntriesEventListene
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 531, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel1)
-                                    .addComponent(jLabel2))
-                                .addGap(28, 28, 28)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(bootstrapTextField, javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(localPortTextField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 317, Short.MAX_VALUE))
-                                .addGap(30, 30, 30))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(statusLable, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
+                            .addComponent(jLabel1)
+                            .addComponent(jLabel2)
+                            .addComponent(statusLable, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(28, 28, 28)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(bootstrapTextField, javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(localPortTextField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 317, Short.MAX_VALUE))
+                            .addComponent(continueButton, javax.swing.GroupLayout.PREFERRED_SIZE, 319, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(28, 28, 28)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addComponent(connectButton, javax.swing.GroupLayout.DEFAULT_SIZE, 92, Short.MAX_VALUE)
                             .addComponent(initButton, javax.swing.GroupLayout.DEFAULT_SIZE, 92, Short.MAX_VALUE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(showDebugButton, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(showDebugButton, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(debuGvalueLabel)
@@ -229,7 +221,7 @@ public class MainFrame extends javax.swing.JFrame implements EntriesEventListene
                             .addComponent(debuGkeyTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 318, Short.MAX_VALUE))
                         .addGap(30, 30, 30)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(debuGretrieveButton, javax.swing.GroupLayout.DEFAULT_SIZE, 91, Short.MAX_VALUE)
+                            .addComponent(debuGremoveButton, javax.swing.GroupLayout.DEFAULT_SIZE, 91, Short.MAX_VALUE)
                             .addComponent(debuGinsertButton, javax.swing.GroupLayout.DEFAULT_SIZE, 91, Short.MAX_VALUE))))
                 .addContainerGap())
         );
@@ -248,8 +240,11 @@ public class MainFrame extends javax.swing.JFrame implements EntriesEventListene
                     .addComponent(connectButton))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(statusLable, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(showDebugButton, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(showDebugButton, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(2, 2, 2)
+                        .addComponent(statusLable, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(continueButton, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -260,7 +255,7 @@ public class MainFrame extends javax.swing.JFrame implements EntriesEventListene
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(debuGvalueTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(debuGvalueLabel)
-                    .addComponent(debuGretrieveButton))
+                    .addComponent(debuGremoveButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -356,20 +351,19 @@ public class MainFrame extends javax.swing.JFrame implements EntriesEventListene
         chord.insert(new StringKey(key), value);
     }//GEN-LAST:event_debuGinsertButtonActionPerformed
 
-    private void debuGretrieveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_debuGretrieveButtonActionPerformed
+    private void debuGremoveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_debuGremoveButtonActionPerformed
         String key = this.debuGkeyTextField.getText();
         Set<Serializable> set = null;
-        System.out.println("Trying to get key " + key);
 
         set = chord.retrieve(new StringKey(key));
         
-        String value = "";
+        Serializable value = "";
         Iterator<Serializable> i = set.iterator();
         while(i.hasNext()){
-            value = i.next().toString();
+            value = i.next();
+            chord.remove(new StringKey(key), value);
         }
-        this.debuGvalueTextField.setText(value);
-    }//GEN-LAST:event_debuGretrieveButtonActionPerformed
+    }//GEN-LAST:event_debuGremoveButtonActionPerformed
 
     private void localPortTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_localPortTextFieldActionPerformed
         // TODO add your handling code here:
@@ -384,11 +378,20 @@ public class MainFrame extends javax.swing.JFrame implements EntriesEventListene
         
     }//GEN-LAST:event_showDebugButtonActionPerformed
 
+    private void continueButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_continueButtonActionPerformed
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new ExecutorForm(chord).setVisible(true);
+            }
+        });
+        this.dispose();
+    }//GEN-LAST:event_continueButtonActionPerformed
+
     private void setDebugButtonsVisibility(boolean b){
         this.debuGinsertButton.setVisible(b);
         this.debuGkeyTextField.setVisible(b);
         this.debuGreportTextArea.setVisible(b);
-        this.debuGretrieveButton.setVisible(b);
+        this.debuGremoveButton.setVisible(b);
         this.debuGvalueTextField.setVisible(b);
         this.debugKeyLabel.setVisible(b);
         this.debuGvalueLabel.setVisible(b);
@@ -409,10 +412,11 @@ public class MainFrame extends javax.swing.JFrame implements EntriesEventListene
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField bootstrapTextField;
     private javax.swing.JButton connectButton;
+    private javax.swing.JButton continueButton;
     private javax.swing.JButton debuGinsertButton;
     private javax.swing.JTextField debuGkeyTextField;
+    private javax.swing.JButton debuGremoveButton;
     private javax.swing.JTextArea debuGreportTextArea;
-    private javax.swing.JButton debuGretrieveButton;
     private javax.swing.JLabel debuGvalueLabel;
     private javax.swing.JTextField debuGvalueTextField;
     private javax.swing.JLabel debugKeyLabel;
@@ -425,7 +429,7 @@ public class MainFrame extends javax.swing.JFrame implements EntriesEventListene
     private javax.swing.JLabel statusLable;
     // End of variables declaration//GEN-END:variables
 
-    public void newEvent(String string) {
+    public void newEvent(int i, Object o) {
         this.debuGreportTextArea.setText(this.chord.printMyEntries());
     }
 
