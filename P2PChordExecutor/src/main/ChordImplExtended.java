@@ -25,7 +25,7 @@ public class ChordImplExtended extends ChordImpl {
                 if (itBelongsToMe(e.getId())){
                     ret = ret +"\n"+ e.toString();
                 }else{
-                    ret = ret +"\n  ----("+ e.toString() + ")";
+                    ret = ret +"\n  *Replica of "+ e.toString() + "";
                 }
             }
             
