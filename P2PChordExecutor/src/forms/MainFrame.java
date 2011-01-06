@@ -40,7 +40,7 @@ import main.*;
  *
  * @author Mauricio
  */
-public class MainFrame extends javax.swing.JFrame implements PeriodicTask {
+public class MainFrame extends javax.swing.JFrame implements EntriesEventListener{
     private final int reportUpgradeInterval = 1000;
     private ChordImplExtended chord = null;
 
@@ -345,10 +345,9 @@ public class MainFrame extends javax.swing.JFrame implements PeriodicTask {
         this.connectButton.setEnabled(false);
         this.bootstrapTextField.setEnabled(false);
         this.localPortTextField.setEnabled(false);
-
+        this.chord.getEntries().setEventListener(this);
         this.setTitle(this.getTitle() + " - " + chord.getID());
-        Timer timer = new Timer(this, reportUpgradeInterval);
-        timer.start();
+
     }
 
     private void keyTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_keyTextFieldActionPerformed
@@ -412,14 +411,9 @@ public class MainFrame extends javax.swing.JFrame implements PeriodicTask {
     private javax.swing.JTextField valueTextField;
     // End of variables declaration//GEN-END:variables
 
-    public void periodicTask() {
-        /* Update report text area. */
-        try{
-        this.reportTextArea.setText(chord.printMyEntries());
-        System.out.println(chord.printEntries());
-        }catch(Exception e){
-            System.out.println("Trying to use chord once it was freed: avoided.");
-        }
+    public void newEvent(String string) {
+        this.reportTextArea.setText(this.chord.printMyEntries());
     }
+
 
 }
