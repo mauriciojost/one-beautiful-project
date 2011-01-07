@@ -336,8 +336,23 @@ public class MainFrame extends javax.swing.JFrame implements EntriesEventListene
         this.connectButton.setEnabled(false);
         this.bootstrapTextField.setEnabled(false);
         this.localPortTextField.setEnabled(false);
-        this.chord.getEntries().setEventListener(this);
+        //this.chord.getEntries().setEventListener(this);
         this.setTitle(this.getTitle() + " - " + chord.getID());
+
+        Thread t = new Thread(new Runnable(){
+
+            public void run() {
+                while(true){
+                    try{
+                        Thread.sleep(2000);
+                    }catch(Exception e){}
+                    debuGreportTextArea.setText(chord.printMyEntries());
+                    //System.out.println(chord.printEntries());
+                }
+            }
+
+        });
+        t.start();
 
     }
 
@@ -348,20 +363,20 @@ public class MainFrame extends javax.swing.JFrame implements EntriesEventListene
     private void debuGinsertButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_debuGinsertButtonActionPerformed
         String key = this.debuGkeyTextField.getText();
         String value = this.debuGvalueTextField.getText();
-        chord.insert(new StringKey(key), value);
+        chord.insert(new MyKey(key), value);
     }//GEN-LAST:event_debuGinsertButtonActionPerformed
 
     private void debuGremoveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_debuGremoveButtonActionPerformed
         String key = this.debuGkeyTextField.getText();
         Set<Serializable> set = null;
 
-        set = chord.retrieve(new StringKey(key));
+        set = chord.retrieve(new MyKey(key));
         
         Serializable value = "";
         Iterator<Serializable> i = set.iterator();
         while(i.hasNext()){
             value = i.next();
-            chord.remove(new StringKey(key), value);
+            chord.remove(new MyKey(key), value);
         }
     }//GEN-LAST:event_debuGremoveButtonActionPerformed
 

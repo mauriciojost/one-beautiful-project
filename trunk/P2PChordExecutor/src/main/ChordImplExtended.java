@@ -4,6 +4,8 @@ package main;
 import de.uniba.wiai.lspi.chord.service.impl.*;
 import de.uniba.wiai.lspi.chord.com.Entry;
 import de.uniba.wiai.lspi.chord.data.ID;
+import de.uniba.wiai.lspi.chord.service.Key;
+import java.util.ArrayList;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -13,26 +15,19 @@ public class ChordImplExtended extends ChordImpl {
 
     public String printMyEntries(){
         String ret = "";
-        Collection<Set> set = this.entries.getValues();
 
-        Iterator<Set> i = set.iterator();
-        System.out.println("Printing " + set.size() + " elements.");
-        while(i.hasNext()){
-            Set s = i.next();
-            Iterator <Entry> j = s.iterator();
-            while(j.hasNext()){
-                Entry e = j.next();
-                if (itBelongsToMe(e.getId())){
-                    ret = ret +"\n"+ e.toString();
-                }else{
-                    ret = ret +"\n  *Replica of "+ e.toString() + "";
-                }
+        Parser p = new Parser();
+        ArrayList<MyKey> keys = p.getAllKeys(this.printEntries());
+        for(int i=0; i<keys.size(); i++){
+            MyKey key = keys.get(i);
+            if (itBelongsToMe(key.getEquivalentID())){
+                ret = ret +"\n"+ key;
+            }else{
+                ret = ret +"\n  *Replica of "+ key + "";
             }
-            
-            
         }
-        System.out.println(ret + "\nPrinting done.");
-        return ret; 
+
+        return ret;
     }
 
     public boolean itBelongsToMe(ID key){
