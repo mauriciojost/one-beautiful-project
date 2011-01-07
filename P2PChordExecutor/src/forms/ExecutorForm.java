@@ -45,7 +45,7 @@ public class ExecutorForm extends javax.swing.JFrame implements EntriesEventList
     /** Creates new form ExecutorForm */
     public ExecutorForm(ChordImplExtended ch) {
         chord = ch;
-        chord.getEntries().setEventListener(this);
+        //chord.getEntries().setEventListener(this);
         initComponents();
         this.setLocation((                      /* Put the window in the center of the screeen. */
             Toolkit.getDefaultToolkit().getScreenSize().
