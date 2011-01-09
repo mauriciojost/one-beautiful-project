@@ -23,18 +23,32 @@ Entries:
 public class Parser {
     
     public ArrayList<MyKey> getAllKeys(String entries){
-        byte b[] = new byte[4];
+        
+        byte b[] = new byte[MyKey.KEY_SIZE];
         MyKey key;
         ArrayList<MyKey> values = new ArrayList<MyKey>();
-        
-        Pattern strMatch = Pattern.compile( "key = (.*) (.*) (.*) (.*) , value = \\[");
+        String strmatch = "key = ";
+        for (int i=0;i<MyKey.KEY_SIZE; i++){
+            strmatch = strmatch + "(\\S{2}) ";
+        }
+        strmatch = strmatch + ", value = \\["; 
+        System.out.println("Getting all keys... + "  + strmatch);
+        Pattern strMatch = Pattern.compile(strmatch);
         Matcher m = strMatch.matcher(entries);
+        System.out.println("Getting all keys... + "  + strmatch);
         while(m.find()){
-            for (int i = 0; i<4; i++){
-                int s = Integer.valueOf(m.group(i+1), 16);
+
+            System.out.print("One new key found ");
+            for (int i = 0; i<MyKey.KEY_SIZE; i++){
+                String currentbyte = m.group(i+1);
+                System.out.print("" + currentbyte);
+                int s = Integer.valueOf(currentbyte, 16);
                 b[i] = (byte)s;
             }
+
             key = new MyKey(b);
+            System.out.print("The new key is " + key.toString());
+
             values.add(key);
             //System.out.println("Key: " + key);
         }

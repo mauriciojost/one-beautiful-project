@@ -31,6 +31,7 @@ public class ChordImplExtended extends ChordImpl {
     }
 
     public boolean itBelongsToMe(ID key){
+        System.out.println("Trying to compare my key " + getID().toHexString() + " with pred key " + getPredecessorID().toHexString() + " with key " + key.toHexString()); 
         if (this.getPredecessorID().compareTo(this.getID())>0){ /* pred > me */
             /* I am the first in the cord. Mi predecesor is the last one. */
             if ((this.getPredecessorID().compareTo(key)>=0) && (this.getID().compareTo(key)>=0)){
