@@ -6,17 +6,12 @@
 package main;
 
 import de.uniba.wiai.lspi.chord.data.ID;
-import de.uniba.wiai.lspi.chord.service.*;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-
-
 /*
-
-
 Entries:
   key = 71 06 95 17 , value = [( key = 71 06 95 17 , value = value12)]
   key = A6 2F 22 25 , value = [( key = A6 2F 22 25 , value = value1213), ( key = A6 2F 22 25 , value = value)]
@@ -35,7 +30,6 @@ public class Parser {
     private Parser(){}
     
     public ArrayList<ID> getAllIDs(String entries){
-        final int ID_SIZE = 20;
         byte b[] = new byte[ID_SIZE];
         ID id;
         ArrayList<ID> values = new ArrayList<ID>();
@@ -44,22 +38,22 @@ public class Parser {
             strmatch = strmatch + "(\\S{2}) ";
         }
         strmatch = strmatch + ", value = \\["; 
-        System.out.println("Getting all keys... + "  + strmatch);
+        //System.out.println("Getting all keys... + "  + strmatch);
         Pattern strMatch = Pattern.compile(strmatch);
         Matcher m = strMatch.matcher(entries);
-        System.out.println("Getting all keys... + "  + strmatch);
+        //System.out.println("Getting all keys... + "  + strmatch);
         while(m.find()){
 
-            System.out.print("One new key found ");
+            //System.out.print("One new key found ");
             for (int i = 0; i<ID_SIZE; i++){
                 String currentbyte = m.group(i+1);
-                System.out.print("" + currentbyte);
+                //System.out.print("" + currentbyte);
                 int s = Integer.valueOf(currentbyte, 16);
                 b[i] = (byte)s;
             }
 
             id = new ID(b);
-            System.out.print("The new ID is " + id.toString());
+            //System.out.print("The new ID is " + id.toString());
 
             values.add(id);
             //System.out.println("Key: " + key);
