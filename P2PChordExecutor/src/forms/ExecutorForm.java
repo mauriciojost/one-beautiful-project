@@ -12,25 +12,28 @@
 package forms;
 
 import de.uniba.wiai.lspi.chord.com.Entry;
-import de.uniba.wiai.lspi.chord.service.impl.Entries;
+import de.uniba.wiai.lspi.chord.data.ID;
 import de.uniba.wiai.lspi.chord.service.impl.EntriesEventListener;
 import java.awt.Toolkit;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Set;
 
 import javax.swing.UIManager;
 import javax.swing.table.TableColumnModel;
 import main.ChordImplExtended;
+import main.MyKey;
+import main.Parser;
 
 /**
  *
  * @author Mauricio
  */
-public class ExecutorForm extends javax.swing.JFrame implements EntriesEventListener {
+public class ExecutorForm extends javax.swing.JFrame{
     private ChordImplExtended chord;
     private final int PROCESS_NAME = 0;
     private final int PROCESS_STATUS = 1;
-    private ArrayList<Entry> entries = new ArrayList<Entry>();
 
 
     static{
@@ -53,8 +56,26 @@ public class ExecutorForm extends javax.swing.JFrame implements EntriesEventList
             (Toolkit.getDefaultToolkit().getScreenSize().
             height-this.getSize().height)/2);
         initMyComponents();
+        initSystem();
     }
 
+    private void initSystem(){
+                Thread t = new Thread(new Runnable(){
+
+            public void run() {
+                while(true){
+                    try{
+                        Thread.sleep(2000);
+                        ArrayList<ID> ids = Parser.getParser().getAllIDs(chord.printEntries());
+                        formatEntries(ids);
+                    }catch(Exception e){}
+                }
+            }
+
+        });
+        t.start();
+
+    }
 
     private void initMyComponents(){
         setInfoTableCell("Name", -1, this.PROCESS_NAME);
@@ -108,34 +129,22 @@ public class ExecutorForm extends javax.swing.JFrame implements EntriesEventList
     private javax.swing.JScrollPane jScrollPane2;
     // End of variables declaration//GEN-END:variables
 
-    public synchronized void newEvent(int i, Object o) {
-        switch(i){
-            case EntriesEventListener.ENTRY_ADDED:
-                this.entries.add((Entry)o);
-                break;
-            case EntriesEventListener.ENTRY_REMOVED:
-                this.entries.remove((Entry)o);
-                break;
-            default:
-                System.out.println("Nothing to do in this event.");
-                break; 
-        }
-       this.formatEntries(entries);
-    }
-
-    private void formatEntries(ArrayList entries){
-        Serializable a;
-        Object[] ar = entries.toArray();
+    private void formatEntries(ArrayList<ID> ids){
+        
         
         int i;
 
-        for (i=0;i<ar.length;i++){
-            Entry ent = ((Entry)(ar[i]));
+        for (i=0;i<ids.size();i++){
+            Set<Serializable> values = chord.retrieve(ids.get(i));
             //System.out.println("Entrie " + ent);
-            if (chord.itBelongsToMe(ent.getId())){
-                this.setInfoTableCell(ent.getValue().toString(), i, 0);
-            }else{
-                this.setInfoTableCell(" *" + ent.getValue().toString(), i, 0);
+            Iterator j = values.iterator();
+            while(j.hasNext()){
+                String value = ((Object)j.next()).toString();
+                if (chord.itBelongsToMe(ids.get(i))){
+                    this.setInfoTableCell(value, i, 0);
+                }else{
+                    this.setInfoTableCell(" *" + value, i, 0);
+                }
             }
             
         }
