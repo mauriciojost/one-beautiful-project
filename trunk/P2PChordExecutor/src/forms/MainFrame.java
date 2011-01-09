@@ -110,7 +110,7 @@ public class MainFrame extends javax.swing.JFrame implements EntriesEventListene
             }
         });
 
-        localPortTextField.setText("8081");
+        localPortTextField.setText("8080");
         localPortTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 localPortTextFieldActionPerformed(evt);
@@ -345,9 +345,8 @@ public class MainFrame extends javax.swing.JFrame implements EntriesEventListene
                 while(true){
                     try{
                         Thread.sleep(2000);
+                        debuGreportTextArea.setText(chord.printMyEntries());
                     }catch(Exception e){}
-                    debuGreportTextArea.setText(chord.printMyEntries());
-                    //System.out.println(chord.printEntries());
                 }
             }
 

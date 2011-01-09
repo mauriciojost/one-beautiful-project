@@ -3,7 +3,10 @@ package main;
 
 import de.uniba.wiai.lspi.chord.service.impl.*;
 import de.uniba.wiai.lspi.chord.data.ID;
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Set;
 
 public class ChordImplExtended extends ChordImpl {
 
@@ -40,5 +43,31 @@ public class ChordImplExtended extends ChordImpl {
                 return true;
             }   
         }   
+    }
+
+
+    public Serializable retrieveUnique(MyKey key){
+        Set<Serializable> unique = retrieve(key);
+        if (unique.size()>1){
+            System.out.println("Element supposed to have one element had more.");
+        }
+        Iterator<Serializable> i = unique.iterator();
+        while(i.hasNext()){
+            return i.next();
+        }
+        return null;
+    }
+
+
+    public Serializable retrieveUnique(ID id){
+        Set<Serializable> unique = retrieve(id);
+        if (unique.size()>1){
+            System.out.println("Element supposed to have one element had more.");
+        }
+        Iterator<Serializable> i = unique.iterator();
+        while(i.hasNext()){
+            return i.next();
+        }
+        return null;
     }
 }
