@@ -28,7 +28,8 @@ public class JobPackage implements Serializable{
     public static final String STATUS_WAITING = "status-waiting";
     public static final String STATUS_EXECUTING = "status-executing";
     public static final String STATUS_DONE = "status-done";
-    public static final int GENERAL_JOB_STEP = -1; 
+    public static final int GENERAL_JOB_STEP = -1;
+    public static final int PARTICULAR_SUBJOB_STEP = -2;
     private int jobInstance = 0; /* Hermano en la misma etapa. */
     private int jobStep = 0; /* Etapa 1, etapa 2 en nuestro flow chart. */
     private String zipFileName;
@@ -36,13 +37,23 @@ public class JobPackage implements Serializable{
     private String generalJobName;
     private byte[] zipFileContent;
     private String jobDescriptorContent;
-    private String output; 
+    private String output;
+    private String executionCommand;
+    private String jobFolder;
 
     public static void main(String[] args){
         //JobPackage jp = new JobPackage("nombre", ".\\src\\resources\\job1.zip", 0, 0);
         System.out.println(" ");
     }
 
+
+    public void setExecutionCommand(String command){
+        this.executionCommand = command;
+    }
+
+    public String getExecutionCommand(){
+        return this.executionCommand;
+    }
 
     public JobPackage(String jobname, String subjobname, String zipfilename, int instance, int jobstep) throws Exception{
         this.generalJobName = jobname;
@@ -51,10 +62,17 @@ public class JobPackage implements Serializable{
         this.jobStep = jobstep;
         this.output = "<Not finalized yet>";
 
+
         String jobfolder;
         if (jobstep == GENERAL_JOB_STEP){
             this.zipFileName = this.moveJobPacketToStandardLocation(zipfilename);
             jobfolder = zipFileName+"-folder";
+            Unzip uz = new Unzip(zipFileName, jobfolder + File.separator);
+            uz.unzipIt();
+        }else if(jobstep == PARTICULAR_SUBJOB_STEP){
+            this.zipFileName = this.moveJobPacketToStandardLocation(zipfilename);
+
+            jobfolder = zipFileName + "-" + subJobName;
             Unzip uz = new Unzip(zipFileName, jobfolder + File.separator);
             uz.unzipIt();
         }else{
@@ -65,9 +83,18 @@ public class JobPackage implements Serializable{
         this.jobDescriptorContent = this.getJobDescriptorFromFile(jobfolder + File.separator + "job_descriptor.xml");
 
         this.zipFileContent = JobPackage.readFile(zipFileName);
+        this.jobFolder = jobfolder;
 
     }
 
+
+    public String getJobFolder(){
+        return jobFolder; 
+    }
+
+    public String getZipFileName(){
+        return zipFileName;
+    }
 
     public static byte[] readFile(String filename){
         byte buff[] = null;
@@ -112,8 +139,10 @@ public class JobPackage implements Serializable{
 //        if (!success) {
 //            System.err.println("Unable to rename the job.");
 //        }
-        
-        this.copyDirectory(src, newlocation);
+
+        if (!src.equals(newlocation)){
+            this.copyDirectory(src, newlocation);
+        }
         
         return newlocation.getPath();
     }

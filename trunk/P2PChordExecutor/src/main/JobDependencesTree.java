@@ -205,6 +205,7 @@ public class JobDependencesTree extends Thread{
             String name = m.group(3);
             String execution = m.group(4);
             sj = new JobPackage(general_job_name, name, filename, instance, step);
+            sj.setExecutionCommand(execution);
         }
         else{
             System.err.println("Cannot parse as a sub job: " + subjobstr);
