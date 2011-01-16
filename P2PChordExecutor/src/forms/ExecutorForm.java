@@ -15,27 +15,28 @@ import de.uniba.wiai.lspi.chord.data.ID;
 import java.awt.Toolkit;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Iterator;
 import java.util.Set;
 
 import javax.swing.UIManager;
 import javax.swing.table.TableColumnModel;
 import main.ChordImplExtended;
+import main.JobDependencesTree;
 import main.JobPackage;
 import main.MyKey;
 import main.Parser;
 
 public class ExecutorForm extends javax.swing.JFrame{
     private ChordImplExtended chord;
-    private final String STATUS_WAITING = "status-waiting";
-    private final String STATUS_EXECUTING = "status-executing";
-    private final String STATUS_DONE = "status-done";
 
     private final int PROCESS_NAME = 0;
     private final int PROCESS_STATUS = 1;
 
     private final int UPGRADE_TIME_MS = 4000; 
-    private ArrayList<JobPackage> jobsRequestedHere;
+    private ArrayList<String> jobsRequestedHereEvent;
+    private ArrayList<String> foreignJobsExecutedHere;
+    private ArrayList<JobDependencesTree> jobs;
 
     static{
         try  {
@@ -60,17 +61,18 @@ public class ExecutorForm extends javax.swing.JFrame{
     }
 
     private void initSystem(){
-        jobsRequestedHere = new ArrayList<JobPackage>();
+        
         Thread t = new Thread(new Runnable(){
             public void run() {
                 while(true){
                     try{
                         Thread.sleep(UPGRADE_TIME_MS);
                         ArrayList<ID> ids = Parser.getParser().getAllIDs(chord.printEntries());
-                        checkForPendingTasks(ids);
-                        refreshForeignJobsExecutedHereTable(ids);
-                        refreshLocallyRequestedJobsTable();
-                    }catch(Exception e){}
+                        checkForPendingTasks(ids, foreignJobsExecutedHere);
+                        refreshForeignJobsExecutedHereTable(foreignJobsExecutedHere);
+                    }catch(Exception e){
+                        e.printStackTrace();
+                    }
                 }
             }
         });
@@ -78,7 +80,7 @@ public class ExecutorForm extends javax.swing.JFrame{
 
     }
 
-    private void checkForPendingTasks(ArrayList<ID> localIDs){
+    private void checkForPendingTasks(ArrayList<ID> localIDs, ArrayList<String> executedHere){
         /* Here we check if there are pending tasks to execute.
          * If there is key whose value is not one status string, it is a
          * task to execute.
@@ -92,19 +94,22 @@ public class ExecutorForm extends javax.swing.JFrame{
             System.out.println("\tThere is something in my list... To execute?");
             Serializable value = chord.retrieveUnique(currentID);
             if (!this.isStatus(value)){
-                System.out.println("\tWe have found one non status: " + value);
-
                 JobPackage job = (JobPackage)value;
-                
-                MyKey status_key = new MyKey((String)job.getStatusIdentifier());
-                Serializable status = chord.retrieveUnique(status_key);
+                if (chord.itBelongsToMe(currentID)){
+                    System.out.println("\tI have found one job that is mine! (a non status): " + job.getDataIdentifier() + "-" + job.getName());
+                    MyKey status_key = new MyKey((String)job.getStatusIdentifier());
+                    Serializable status = chord.retrieveUnique(status_key);
+                    System.out.println("\tIts status of execution is: " + (String)status);
 
-                if (((String)status).equals(this.STATUS_WAITING)){
-                    
-                    chord.remove(status_key, status);
-                    chord.insert(status_key, this.STATUS_EXECUTING);
-                    System.out.println("For now we will just change its status.");
-                    executeTask(job);
+                    if (((String)status).equals(JobPackage.STATUS_WAITING)){
+                        System.out.println("\tChanging status...\n");
+                        chord.remove(status_key, status);
+                        chord.insert(status_key, JobPackage.STATUS_DONE);
+                        executedHere.add("Job " + job.getName() + " started at " + Calendar.getInstance().getTime().toString());
+                        executeTask(job);
+                        System.out.println("\tJob done.\n");
+                        executedHere.add("Job " + job.getName() + " finished at " + Calendar.getInstance().getTime().toString());
+                    }
                 }
             }
          }
@@ -112,13 +117,16 @@ public class ExecutorForm extends javax.swing.JFrame{
     }
 
     private void executeTask(JobPackage jp){
-        System.out.println("This task must be executed!!!.");
+        jp.getFileContent();
+        System.out.println("Executing (simulation)...\n");
     }
 
     private void initMyComponents(){
         setLocallyRequestedJobsTableCell("Name", -1, this.PROCESS_NAME);
-        setLocallyRequestedJobsTableCell("Status", -1, this.PROCESS_STATUS);
-
+        //setLocallyRequestedJobsTableCell("Status", -1, this.PROCESS_STATUS);
+        jobs = new ArrayList<JobDependencesTree>();
+        foreignJobsExecutedHere = new ArrayList<String>();
+        jobsRequestedHereEvent = new ArrayList<String>();
     }
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -135,28 +143,78 @@ public class ExecutorForm extends javax.swing.JFrame{
 
         requestedJobsTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null}
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null}
             },
             new String [] {
-                "Title 1", "Title 2"
+                "Title 1"
             }
         ));
         jScrollPane2.setViewportView(requestedJobsTable);
 
         locallyExecutedJobsTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null}
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null}
             },
             new String [] {
-                "Title 1", "Title 2"
+                "Title 1"
             }
         ));
         jScrollPane3.setViewportView(locallyExecutedJobsTable);
@@ -210,18 +268,35 @@ public class ExecutorForm extends javax.swing.JFrame{
 
     private void addJobButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addJobButtonActionPerformed
 
-        String filename = "c:\\job.zip";
-        JobPackage jp = new JobPackage(filename, 0);
-        addJobRequestedHere(jp);
+        String zip = ".\\src\\resources\\job1.zip";
+        //JobPackage jp = new JobPackage(filename, 0);
+        addJobRequestedHere(zip);
         
     }//GEN-LAST:event_addJobButtonActionPerformed
 
-    private void addJobRequestedHere(JobPackage jp){
-        jobsRequestedHere.add(jp);
-        chord.insert(new MyKey(jp.getDataIdentifier()), jp);
-        chord.insert(new MyKey(jp.getStatusIdentifier()), this.STATUS_WAITING);
+    private void addJobRequestedHere(String zipFileName){
+        //jobsRequestedHere.add(jp);
+//        chord.insert(new MyKey(jp.getDataIdentifier()), jp);
+//        chord.insert(new MyKey(jp.getStatusIdentifier()), this.STATUS_WAITING);
+        try{
+            JobDependencesTree jdt = new JobDependencesTree(zipFileName);
+            jdt.startJob(this, chord);
+            jobs.add(jdt);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
     }
 
+
+    public void addJobRequestedHereEvent(String event){
+        int i;
+        jobsRequestedHereEvent.add(event);
+        for (i=0;i<jobsRequestedHereEvent.size();i++){
+            String current = jobsRequestedHereEvent.get(i);
+
+            this.setLocallyRequestedJobsTableCell(current, i, 0);
+        }
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addJobButton;
@@ -234,20 +309,6 @@ public class ExecutorForm extends javax.swing.JFrame{
     // End of variables declaration//GEN-END:variables
 
 
-    private void refreshLocallyRequestedJobsTable(){
-
-        int i;
-        for (i=0;i<jobsRequestedHere.size();i++){
-            JobPackage currentJ = jobsRequestedHere.get(i);
-
-            String name = currentJ.getDataIdentifier();
-            String status = (String)chord.retrieveUnique(
-                    new MyKey(currentJ.getStatusIdentifier())
-                    );            
-            this.setLocallyRequestedJobsTableCell(name, i, 0);
-            this.setLocallyRequestedJobsTableCell(status, i, 1);
-        }
-    }
 
     private void setLocallyRequestedJobsTableCell(String text, int row, int column){
         if (row>=0){
@@ -258,22 +319,10 @@ public class ExecutorForm extends javax.swing.JFrame{
         }
     }
 
-    private void refreshForeignJobsExecutedHereTable(ArrayList<ID> ids){
+    private void refreshForeignJobsExecutedHereTable(ArrayList<String> events){
         int i;
-        for (i=0;i<ids.size();i++){
-            Set<Serializable> values = chord.retrieve(ids.get(i));
-            //System.out.println("Entrie " + ent);
-            Iterator j = values.iterator();
-            while(j.hasNext()){
-                String value = ((Object)j.next()).toString();
-                if (chord.itBelongsToMe(ids.get(i))){
-                    if (!isStatus(value)){
-                        this.setForeignJobsExecutedHereTableCell(value, i, 0);
-                    }
-                }else{
-                    this.setForeignJobsExecutedHereTableCell("-", i, 0);
-                }
-            }
+        for (i=0;i<events.size();i++){
+            this.setForeignJobsExecutedHereTableCell(events.get(i), i, 0);
         }
     }
 
