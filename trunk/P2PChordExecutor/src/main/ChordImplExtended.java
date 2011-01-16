@@ -70,4 +70,16 @@ public class ChordImplExtended extends ChordImpl {
         }
         return null;
     }
+
+    public void insertJobPackage(JobPackage jp, String status){
+        this.insert(new MyKey(jp.getDataIdentifier()), jp);
+        this.insert(new MyKey(jp.getStatusIdentifier()), status);
+    }
+
+    public void removeJobPackage(JobPackage jp){
+        this.remove(new MyKey(jp.getDataIdentifier()), jp);
+        this.remove(new MyKey(jp.getStatusIdentifier()), JobPackage.STATUS_DONE);
+        this.remove(new MyKey(jp.getStatusIdentifier()), JobPackage.STATUS_EXECUTING);
+        this.remove(new MyKey(jp.getStatusIdentifier()), JobPackage.STATUS_WAITING);
+    }
 }

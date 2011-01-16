@@ -13,22 +13,11 @@ import java.util.regex.Pattern;
 
 public class JobDescriptorParser {
 
-
-
-    public static byte[] readFile(String filename){
-        byte buff[] = null;
-        try {
-            FileInputStream i = new FileInputStream(filename);
-            buff = new byte[i.available()];
-            i.read(buff);
-            
-        }catch (Exception e){
-            System.err.println("Cannot open file: " + filename);
-            e.printStackTrace();
-        }
-
-        return buff;
-    }
+    /*
+     *
+     *
+     *
+     */
 
     
     public static String getJobNameFromXML(String rawFileContent){
