@@ -32,9 +32,11 @@ public class JobPackage implements Serializable{
     private int jobInstance = 0; /* Hermano en la misma etapa. */
     private int jobStep = 0; /* Etapa 1, etapa 2 en nuestro flow chart. */
     private String zipFileName;
-    private String jobName;
+    private String subJobName;
+    private String generalJobName;
     private byte[] zipFileContent;
     private String jobDescriptorContent;
+    private String output; 
 
     public static void main(String[] args){
         //JobPackage jp = new JobPackage("nombre", ".\\src\\resources\\job1.zip", 0, 0);
@@ -42,10 +44,12 @@ public class JobPackage implements Serializable{
     }
 
 
-    public JobPackage(String jobname, String zipfilename, int instance, int jobstep) throws Exception{
-        this.jobName = jobname;
+    public JobPackage(String jobname, String subjobname, String zipfilename, int instance, int jobstep) throws Exception{
+        this.generalJobName = jobname;
+        this.subJobName = subjobname;
         this.jobInstance = instance;
         this.jobStep = jobstep;
+        this.output = "<Not finalized yet>";
 
         String jobfolder;
         if (jobstep == GENERAL_JOB_STEP){
@@ -130,13 +134,16 @@ public class JobPackage implements Serializable{
         jobStep = jt;
     }
 
+    public String getGeneralJobName(){
+        return this.generalJobName;
+    }
 
     public String getJobName(){
-        return jobName;
+        return subJobName;
     }
 
     public String getName(){
-        return jobName + "-" + jobStep + "-" + jobInstance;
+        return generalJobName + "-" + subJobName + "-" + jobStep + "-" + jobInstance;
     }
 
     public String getJobDescriptorContent(){
@@ -160,6 +167,13 @@ public class JobPackage implements Serializable{
         return this.getDataIdentifier() + "-status";
     }
 
+    public void setOutput(String output){
+        this.output = output;
+    }
+
+    public String getOutput(){
+        return output;
+    }
 
     public void copyDirectory(File sourceLocation , File targetLocation) throws IOException {
 
