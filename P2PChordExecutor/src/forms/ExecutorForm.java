@@ -17,6 +17,10 @@ import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -144,11 +148,16 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
                     if (JobPackage.STATUS_WAITING.equals(status)){
                         System.out.println("\tChanging status...\n");
                         chord.remove(status_key, status);
-                        chord.insert(status_key, JobPackage.STATUS_DONE);
+                        chord.insert(status_key, JobPackage.STATUS_EXECUTING);
+
+                        chord.remove(new MyKey(job.getDataIdentifier()), job);
+
                         executedHere.add(new JobEvent(job, "started", Calendar.getInstance().getTime()));
                         executeTask(job);
-                        System.out.println("\tJob done.\n");
                         executedHere.add(new JobEvent(job, "finished", Calendar.getInstance().getTime()));
+
+                        chord.remove(status_key, status);
+                        chord.insert(status_key, JobPackage.STATUS_DONE);
                     }
                 }
             }
@@ -156,10 +165,39 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
         
     }
 
-    private void executeTask(JobPackage jp){
-        jp.getFileContent();
+    private void executeTask(JobPackage jpvirtual){
+        
+        try{
+            downloadTheFile(jpvirtual);
+            JobPackage jpmaterial = new JobPackage(jpvirtual.getGeneralJobName(),
+                    jpvirtual.getName(),
+                    jpvirtual.getZipFileName(),
+                    0,
+                    JobPackage.PARTICULAR_SUBJOB_STEP);
+
+            //jpvirtual.getExecutionCommand()
+
+            //compress
+            //put_content_in_jpvirtual_again;
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
         System.out.println("Executing (simulation)...\n");
     }
+
+
+    private void downloadTheFile(JobPackage jp) throws FileNotFoundException, IOException{
+        File newFile = new File(jp.getZipFileName());
+        System.out.println("file to download : " + newFile.getPath());
+        //create all non exists folders
+        //else you will hit FileNotFoundException for compressed folder
+        new File(newFile.getParent()).mkdirs();
+        FileOutputStream fos = new FileOutputStream(newFile);
+        fos.write(jp.getFileContent(), 0, jp.getFileContent().length);
+        fos.close();
+    }
+
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
