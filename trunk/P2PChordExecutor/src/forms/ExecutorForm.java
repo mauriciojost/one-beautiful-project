@@ -93,7 +93,7 @@ public class ExecutorForm extends javax.swing.JFrame{
             ID currentID = localIDs.get(i); 
             System.out.println("\tThere is something in my list... To execute?");
             Serializable value = chord.retrieveUnique(currentID);
-            if ((value!=null) && !this.isStatus(value)){
+            if (this.isExecutable(value)){
                 JobPackage job = (JobPackage)value;
                 if (chord.itBelongsToMe(currentID)){
                     System.out.println("\tI have found one job that is mine! (a non status): " + job.getDataIdentifier() + "-" + job.getName());
@@ -346,16 +346,18 @@ public class ExecutorForm extends javax.swing.JFrame{
         }
     }
 
-    private boolean isStatus(Serializable value){
+    private boolean isExecutable(Serializable value){
         String val;
+        if (value==null){
+            return false;
+        }
         try{
             val = (String)value;
             if (val.startsWith("status-")){
-                return true;
+                return false;
             }
         }catch(Exception e){
-
         }
-        return false; 
+        return true;
     }
 }
