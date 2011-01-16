@@ -26,12 +26,22 @@ public class JobDependencesTree extends Thread{
 
 
     public JobDependencesTree (String zipFileName) throws Exception{
-        JobPackage jp = new JobPackage("main", zipFileName, 0, JobPackage.GENERAL_JOB_STEP);
+        JobPackage jp = new JobPackage("main", "main", zipFileName, 0, JobPackage.GENERAL_JOB_STEP);
         this.jobDescriptorContent = jp.getJobDescriptorContent();
         this.zipFileName = jp.getPositionedZipFileName();
         subJobsList = this.generateSubJobsList();
     }
 
+    public JobPackage lookForJobByName(String name){
+        Iterator<JobPackage> i = subJobsList.iterator();
+        while(i.hasNext()){
+            JobPackage curr = i.next();
+            if (curr.getName().equals(name)){
+                return curr; 
+            }
+        }
+        return null;
+    }
 /*
     public JobDependencesTree (String jobDescriptorContent, String zipFileName){
         this.jobDescriptorContent = jobDescriptorContent;
@@ -138,11 +148,19 @@ public class JobDependencesTree extends Thread{
 
     private ArrayList<JobPackage> generateSubJobsList() throws Exception{
         ArrayList<JobPackage> subjobs = new ArrayList<JobPackage>();
-        Pattern strMatch = Pattern.compile( "(<subjob step=\\d*? instance=\\d*? name=\".*?\">.*?</subjob>)");
+        String jobname = "defaultjobname";
+
+        Pattern strMatch = Pattern.compile( "<job_descriptor job_name=\"(.*?)\">");
         Matcher m = strMatch.matcher(jobDescriptorContent);
         while(m.find()){
+            jobname = m.group(1);
+        }
+
+        strMatch = Pattern.compile( "(<subjob step=\\d*? instance=\\d*? name=\".*?\">.*?</subjob>)");
+        m = strMatch.matcher(jobDescriptorContent);
+        while(m.find()){
             String subjob = m.group(1);
-            JobPackage sj = this.generateSubJob(subjob, zipFileName);
+            JobPackage sj = this.generateSubJob(jobname, subjob, zipFileName);
             subjobs.add(sj);
         }
         return subjobs; 
@@ -174,7 +192,7 @@ public class JobDependencesTree extends Thread{
         return max+1;
     }
 
-    private JobPackage generateSubJob(String subjobstr, String filename) throws Exception{
+    private JobPackage generateSubJob(String general_job_name, String subjobstr, String filename) throws Exception{
         /*
         <subjob step=(\d*?) instance=(\d*?) name="(.*?)">(.*?)</subjob>
          */
@@ -186,7 +204,7 @@ public class JobDependencesTree extends Thread{
             int instance = Integer.valueOf(m.group(2));
             String name = m.group(3);
             String execution = m.group(4);
-            sj = new JobPackage(name, filename, instance, step);
+            sj = new JobPackage(general_job_name, name, filename, instance, step);
         }
         else{
             System.err.println("Cannot parse as a sub job: " + subjobstr);
