@@ -1,0 +1,7 @@
+
+<job_descriptor job_name="great_job">
+	<subjob step=000 instance=0 name="decompres">acqua.bat decompress11 decompress22</subjob>
+	<subjob step=01 instance=00 name="calculate1">acqua.bat calculate11 calculate22</subjob>
+	<subjob step=1 instance=001 name="calculate2">acqua.bat calculate33 calculate44</subjob>
+	<subjob step=002 instance=0 name="compress">acqua.bat compress11 compress22</subjob>
+</job_descriptor>
