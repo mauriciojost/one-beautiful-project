@@ -1,10 +1,12 @@
 package main;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Serializable;
 
@@ -46,7 +48,10 @@ public class JobPackage implements Serializable{
         System.out.println(" ");
     }
 
-
+    public void setZipFileContent(byte[] cont){
+            zipFileContent = cont;
+    }
+    
     public void setExecutionCommand(String command){
         this.executionCommand = command;
     }
@@ -230,6 +235,34 @@ public class JobPackage implements Serializable{
             in.close();
             out.close();
         }
+    }
+
+    public static String execute(String workingdirectory, String command){
+        String output = "";
+
+        ProcessBuilder pb = new ProcessBuilder(command);
+        pb.directory(new File(workingdirectory));
+
+        Process process = null;
+        try {
+            process = pb.start();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        InputStream is = process.getInputStream();
+        InputStreamReader isr = new InputStreamReader(is);
+        BufferedReader br = new BufferedReader(isr);
+
+        String line;
+        try {
+            while ((line = br.readLine()) != null) {
+                output = output + line;
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
+        return output;
     }
 
 }

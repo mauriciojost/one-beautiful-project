@@ -42,6 +42,7 @@ import main.JobPackage;
 import main.JobsEventsListener;
 import main.MyKey;
 import main.Parser;
+import main.Zip;
 
 public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListener, MouseListener{
     private ChordImplExtended chord;
@@ -165,8 +166,9 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
         
     }
 
-    private void executeTask(JobPackage jpvirtual){
-        
+    private JobPackage executeTask(JobPackage jpvirtual){
+
+        JobPackage processed=null;
         try{
             downloadTheFile(jpvirtual);
             JobPackage jpmaterial = new JobPackage(jpvirtual.getGeneralJobName(),
@@ -174,16 +176,23 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
                     jpvirtual.getZipFileName(),
                     0,
                     JobPackage.PARTICULAR_SUBJOB_STEP);
+                   
+            String output = JobPackage.execute(jpmaterial.getJobFolder(), jpmaterial.getJobFolder() + File.separator + jpvirtual.getExecutionCommand());
 
-            //jpvirtual.getExecutionCommand()
+            Zip comp = new Zip(jpmaterial.getJobFolder(), jpmaterial.getZipFileName());
+            comp.zip();
 
-            //compress
+            jpvirtual.setZipFileContent(JobPackage.readFile(jpmaterial.getZipFileName()));
+            jpvirtual.setOutput(output);
+
+            processed = jpvirtual; 
             //put_content_in_jpvirtual_again;
         }catch(Exception e){
             e.printStackTrace();
         }
 
-        System.out.println("Executing (simulation)...\n");
+        return processed;
+        
     }
 
 
