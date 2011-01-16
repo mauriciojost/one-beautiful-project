@@ -16,25 +16,27 @@ import java.awt.Toolkit;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Iterator;
-import java.util.Set;
 
 import javax.swing.UIManager;
 import javax.swing.table.TableColumnModel;
 import main.ChordImplExtended;
 import main.JobDependencesTree;
+import main.JobEvent;
 import main.JobPackage;
+import main.JobsEventsListener;
 import main.MyKey;
 import main.Parser;
 
-public class ExecutorForm extends javax.swing.JFrame{
+public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListener{
     private ChordImplExtended chord;
 
     private final int PROCESS_NAME = 0;
     private final int PROCESS_STATUS = 1;
 
     private final int UPGRADE_TIME_MS = 4000; 
-    private ArrayList<String> jobsRequestedHereEvent;
+    private ArrayList<JobEvent> jobsRequestedHereEvents;
     private ArrayList<String> foreignJobsExecutedHere;
     private ArrayList<JobDependencesTree> jobs;
 
@@ -104,13 +106,10 @@ public class ExecutorForm extends javax.swing.JFrame{
                         System.out.println("\tChanging status...\n");
                         chord.remove(status_key, status);
                         chord.insert(status_key, JobPackage.STATUS_DONE);
-                        printThatTable();
                         executedHere.add("Job " + job.getName() + " started at " + Calendar.getInstance().getTime().toString());
-                        printThatTable();
                         executeTask(job);
                         System.out.println("\tJob done.\n");
                         executedHere.add("Job " + job.getName() + " finished at " + Calendar.getInstance().getTime().toString());
-                        printThatTable();
                     }
                 }
             }
@@ -118,15 +117,6 @@ public class ExecutorForm extends javax.swing.JFrame{
         
     }
 
-
-    private void printThatTable(){
-        Iterator<String> i = this.jobsRequestedHereEvent.iterator();
-        System.out.println("Jobs:");
-        while(i.hasNext()){
-            String nex = i.next();
-            System.out.println("\tItem: " + nex);
-        }
-    }
     private void executeTask(JobPackage jp){
         jp.getFileContent();
         System.out.println("Executing (simulation)...\n");
@@ -137,7 +127,15 @@ public class ExecutorForm extends javax.swing.JFrame{
         //setLocallyRequestedJobsTableCell("Status", -1, this.PROCESS_STATUS);
         jobs = new ArrayList<JobDependencesTree>();
         foreignJobsExecutedHere = new ArrayList<String>();
-        jobsRequestedHereEvent = new ArrayList<String>();
+        jobsRequestedHereEvents = new ArrayList<JobEvent>();
+        String[] columnNames = {"Events"};
+        locallyExecutedJobsTable.setModel(
+                new javax.swing.table.DefaultTableModel((Object[])columnNames, 200));
+
+                
+        requestedJobsTable.setModel(
+                new javax.swing.table.DefaultTableModel((Object[])columnNames, 200));
+
     }
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -299,13 +297,12 @@ public class ExecutorForm extends javax.swing.JFrame{
     }
 
 
-    public void addJobRequestedHereEvent(String event){
+    public void addJobRequestedHereEvent(JobEvent je){
         int i;
-        jobsRequestedHereEvent.add(event);
-        for (i=0;i<jobsRequestedHereEvent.size();i++){
-            String current = jobsRequestedHereEvent.get(i);
-
-            this.setLocallyRequestedJobsTableCell(current, i, 0);
+        jobsRequestedHereEvents.add(je);
+        for (i=0;i<jobsRequestedHereEvents.size();i++){
+            JobEvent current = jobsRequestedHereEvents.get(i);
+            this.setLocallyRequestedJobsTableCell(current.getJob().getName() + current.getEvent() + " at " + current.getWhen(), i, 0);
         }
     }
 
@@ -332,6 +329,7 @@ public class ExecutorForm extends javax.swing.JFrame{
 
     private void refreshForeignJobsExecutedHereTable(ArrayList<String> events){
         int i;
+
         for (i=0;i<events.size();i++){
             this.setForeignJobsExecutedHereTableCell(events.get(i), i, 0);
         }

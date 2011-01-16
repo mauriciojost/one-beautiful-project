@@ -1,16 +1,10 @@
 
 package main;
 
-import forms.ExecutorForm;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,7 +21,7 @@ public class JobDependencesTree extends Thread{
     private ArrayList<JobPackage> subJobsList;
     private ChordImplExtended chord;
     private int currentStep = 0;
-    private ExecutorForm executorForm;
+    private JobsEventsListener jobsEventsListener;
 
 
 
@@ -53,9 +47,9 @@ public class JobDependencesTree extends Thread{
 //        jdt.getSubJobsOfStep(1);
     }
 
-    public void startJob(ExecutorForm ef, ChordImplExtended chord){
+    public void startJob(JobsEventsListener jobsEventsListener, ChordImplExtended chord){
         this.chord = chord;
-        this.executorForm = ef;
+        this.jobsEventsListener = jobsEventsListener;
         this.start();
     }
     
@@ -88,7 +82,7 @@ public class JobDependencesTree extends Thread{
         while(i.hasNext()){
             JobPackage jp = i.next();
             chord.insertJobPackage(jp, JobPackage.STATUS_WAITING);
-            executorForm.addJobRequestedHereEvent(jp.getName() + " sent to chord at " + Calendar.getInstance().getTime());
+            jobsEventsListener.addJobRequestedHereEvent(new JobEvent(jp, "sent to chord", Calendar.getInstance().getTime()));
         }
     }
     
@@ -107,7 +101,7 @@ public class JobDependencesTree extends Thread{
                     System.out.println("Not ready...");
                 }else{
                     System.out.println("Ready!!!");
-                    executorForm.addJobRequestedHereEvent(jp.getName() + " finished at " + Calendar.getInstance().getTime());
+                    this.jobsEventsListener.addJobRequestedHereEvent(new JobEvent(jp, "finished", Calendar.getInstance().getTime()));
                 }
             }
             if(not_finished_jobs>0){
