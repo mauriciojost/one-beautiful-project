@@ -81,5 +81,6 @@ public class ChordImplExtended extends ChordImpl {
         this.remove(new MyKey(jp.getStatusIdentifier()), JobPackage.STATUS_DONE);
         this.remove(new MyKey(jp.getStatusIdentifier()), JobPackage.STATUS_EXECUTING);
         this.remove(new MyKey(jp.getStatusIdentifier()), JobPackage.STATUS_WAITING);
+
     }
 }

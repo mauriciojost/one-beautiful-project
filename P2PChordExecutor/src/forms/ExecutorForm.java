@@ -93,22 +93,24 @@ public class ExecutorForm extends javax.swing.JFrame{
             ID currentID = localIDs.get(i); 
             System.out.println("\tThere is something in my list... To execute?");
             Serializable value = chord.retrieveUnique(currentID);
-            if (!this.isStatus(value)){
+            if ((value!=null) && !this.isStatus(value)){
                 JobPackage job = (JobPackage)value;
                 if (chord.itBelongsToMe(currentID)){
                     System.out.println("\tI have found one job that is mine! (a non status): " + job.getDataIdentifier() + "-" + job.getName());
                     MyKey status_key = new MyKey((String)job.getStatusIdentifier());
                     Serializable status = chord.retrieveUnique(status_key);
                     System.out.println("\tIts status of execution is: " + (String)status);
-
-                    if (((String)status).equals(JobPackage.STATUS_WAITING)){
+                    if (JobPackage.STATUS_WAITING.equals(status)){
                         System.out.println("\tChanging status...\n");
                         chord.remove(status_key, status);
                         chord.insert(status_key, JobPackage.STATUS_DONE);
+                        printThatTable();
                         executedHere.add("Job " + job.getName() + " started at " + Calendar.getInstance().getTime().toString());
+                        printThatTable();
                         executeTask(job);
                         System.out.println("\tJob done.\n");
                         executedHere.add("Job " + job.getName() + " finished at " + Calendar.getInstance().getTime().toString());
+                        printThatTable();
                     }
                 }
             }
@@ -116,6 +118,15 @@ public class ExecutorForm extends javax.swing.JFrame{
         
     }
 
+
+    private void printThatTable(){
+        Iterator<String> i = this.jobsRequestedHereEvent.iterator();
+        System.out.println("Jobs:");
+        while(i.hasNext()){
+            String nex = i.next();
+            System.out.println("\tItem: " + nex);
+        }
+    }
     private void executeTask(JobPackage jp){
         jp.getFileContent();
         System.out.println("Executing (simulation)...\n");

@@ -114,11 +114,6 @@ public class JobPackage implements Serializable{
         return newlocation.getPath();
     }
 
-
-    public JobPackage cloneJobPackage() throws Exception{
-        return new JobPackage(jobName, zipFileName, jobInstance++,0);
-    }
-
     public String getPositionedZipFileName(){
         return zipFileName;
     }
