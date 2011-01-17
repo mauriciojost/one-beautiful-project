@@ -10,6 +10,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,9 +32,9 @@ public class JobPackage implements Serializable{
      * <subjob step=1 instance=1 name=>./acqua param1 param2</subjob>
      */
 
-    public static final String STATUS_WAITING = "status-waiting";
+    public static final String STATUS_WAITING =   "status-waiting";
     public static final String STATUS_EXECUTING = "status-executing";
-    public static final String STATUS_DONE = "status-done";
+    public static final String STATUS_DONE =      "status-completely-done";
     public static final int GENERAL_JOB_STEP = -1;
     public static final int PARTICULAR_SUBJOB_STEP = -2;
     private int jobInstance = 0; /* Hermano en la misma etapa. */
@@ -215,7 +217,7 @@ public class JobPackage implements Serializable{
     }
 
     public String getDataIdentifier(){
-        return this.toString();
+        return this.toString() + "-job";
     }
 
     public String getStatusIdentifier(){
@@ -300,4 +302,35 @@ public class JobPackage implements Serializable{
         fos.write(this.getFileContent(), 0, this.getFileContent().length);
         fos.close();
     }
+
+    public static JobPackage getLastJobPackage(Set<Serializable> jobs){
+        Iterator<Serializable> i = jobs.iterator();
+        JobPackage last = null;
+        while(i.hasNext()){
+            JobPackage job = (JobPackage)i.next();
+            if (last==null){
+                last = job;
+            }else if(last.getRealFinishedTime()==null && job.getRealFinishedTime()!=null){
+                last = job;
+            }
+
+        }
+
+        return last; 
+    }
+
+    public static String getLastStatus(Set<Serializable> statuses){
+        Iterator<Serializable> i = statuses.iterator();
+        String last = null;
+        while(i.hasNext()){
+            String st = (String)i.next();
+            if ((last==null) || (st.length()>last.length())){
+                last = st;
+            }
+        }
+
+        return last;
+    }
+
+
 }

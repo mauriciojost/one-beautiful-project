@@ -105,7 +105,7 @@ public class JobDependencesTree extends Thread{
             while(i.hasNext()){
                 JobPackage jp = i.next();
                 System.out.print("Checking for job '" + jp.getName() + "' of substep '" + jp.getJobStep() + "'...");
-                String status = (String)chord.retrieveUnique(new MyKey(jp.getStatusIdentifier()));
+                String status = (String)JobPackage.getLastStatus(chord.retrieveSet(new MyKey(jp.getStatusIdentifier())));
                 if (!status.equals(JobPackage.STATUS_DONE)){
                     not_finished_jobs++; /* At least one has not finished yet. */
                     System.out.println("Not ready...");
@@ -133,7 +133,7 @@ public class JobDependencesTree extends Thread{
         System.out.println("Once done these step's jobs, they will be deleted...");
         while(i.hasNext()){
             JobPackage oldjp = i.next();
-            JobPackage newjp = (JobPackage) chord.retrieveUnique(new MyKey(oldjp.getDataIdentifier()));
+            JobPackage newjp = (JobPackage) JobPackage.getLastJobPackage(chord.retrieveSet(new MyKey(oldjp.getDataIdentifier())));
             procesed_jobs.add(newjp);
             
             finishedJobs.put(newjp.getName(), newjp);

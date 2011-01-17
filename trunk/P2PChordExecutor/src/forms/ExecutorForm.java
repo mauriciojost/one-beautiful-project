@@ -129,13 +129,13 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
          for (int i=0;i<localIDs.size();i++){
             ID currentID = localIDs.get(i); 
             System.out.println("\tThere is something in my list... To execute?");
-            Serializable value = chord.retrieveUnique(currentID);
+            Serializable value = chord.retrieveOneRandom(currentID);
             if (this.isExecutable(value)){
                 JobPackage job = (JobPackage)value;
                 if (chord.itBelongsToMe(currentID)){
                     System.out.println("\tI have found one job that is mine! (a non status): " + job.getDataIdentifier() + "-" + job.getName());
                     MyKey status_key = new MyKey((String)job.getStatusIdentifier());
-                    Serializable status = chord.retrieveUnique(status_key);
+                    Serializable status = JobPackage.getLastStatus(chord.retrieveSet(status_key));
                     System.out.println("\tIts status of execution is: " + (String)status);
                     if (JobPackage.STATUS_WAITING.equals(status)){
                         System.out.println("\tChanging status...\n");
