@@ -1,1 +1,0 @@
-echo hola %1 %2 > salida.txt

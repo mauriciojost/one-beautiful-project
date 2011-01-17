@@ -1,0 +1,1 @@
+echo holaadfaadsfadsfasdgfghdsds %1 %2 > b.txt

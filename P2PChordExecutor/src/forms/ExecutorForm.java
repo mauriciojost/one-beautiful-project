@@ -171,7 +171,7 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
 
         JobPackage processed=null;
         try{
-            downloadTheFile(jpvirtual);
+            jpvirtual.downloadZipFile();
             JobPackage jpmaterial = new JobPackage(jpvirtual.getGeneralJobName(),
                     jpvirtual.getName(),
                     jpvirtual.getZipFileName(),
@@ -196,18 +196,6 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
 
         return processed;
         
-    }
-
-
-    private void downloadTheFile(JobPackage jp) throws FileNotFoundException, IOException{
-        File newFile = new File(jp.getZipFileName());
-        System.out.println("file to download : " + newFile.getPath());
-        //create all non exists folders
-        //else you will hit FileNotFoundException for compressed folder
-        new File(newFile.getParent()).mkdirs();
-        FileOutputStream fos = new FileOutputStream(newFile);
-        fos.write(jp.getFileContent(), 0, jp.getFileContent().length);
-        fos.close();
     }
 
 

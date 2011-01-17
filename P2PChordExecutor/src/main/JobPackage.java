@@ -3,6 +3,7 @@ package main;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,6 +46,7 @@ public class JobPackage implements Serializable{
     private String fileToExecute;
     private String arguments; 
     private String jobFolder;
+    private String generalJobFolder; 
 
 
     public void setZipFileContent(byte[] cont){
@@ -80,6 +82,7 @@ public class JobPackage implements Serializable{
         if (jobstep == GENERAL_JOB_STEP){
             this.zipFileName = this.moveJobPacketToStandardLocation(zipfilename);
             jobfolder = zipFileName+"-folder";
+
             Unzip uz = new Unzip(zipFileName, jobfolder + File.separator);
             uz.unzipIt();
         }else if(jobstep == PARTICULAR_SUBJOB_STEP){
@@ -92,6 +95,7 @@ public class JobPackage implements Serializable{
             this.zipFileName = zipfilename;
             jobfolder = zipFileName+"-folder";
         }
+        generalJobFolder = zipFileName + "-folder";
 
         this.jobDescriptorContent = this.getJobDescriptorFromFile(jobfolder + File.separator + "job_descriptor.xml");
 
@@ -101,6 +105,9 @@ public class JobPackage implements Serializable{
     }
 
 
+    public String getGeneralJobFolder(){
+        return generalJobFolder; 
+    }
     public String getJobFolder(){
         return jobFolder; 
     }
@@ -246,29 +253,8 @@ public class JobPackage implements Serializable{
     }
 
 
-    public static void main(String[] args){
-        JobPackage.execute("C:\\", "hola.bat", "1 2 3");
-    }
-
     public static String execute(String workingdirectory, String command, String arguments){
         String output = "";
-
-        /*
-        Runtime rt = Runtime.getRuntime();
-        Process pr = null;
-        File myFolder = new File("C:\\");
-        try {
-            pr = rt.exec(new File(myFolder, "hola.bat").getAbsolutePath(), null, myFolder);
-        } catch (IOException ex) {
-            Logger.getLogger(JobPackage.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        try {
-            pr.waitFor();
-        } catch (InterruptedException ex) {
-            Logger.getLogger(JobPackage.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        pr.destroy();
-        */
 
         String line;
 
@@ -276,18 +262,8 @@ public class JobPackage implements Serializable{
         Process pr = null;
         File myWorking = new File(workingdirectory);
 
-
         try{
             
-            //String[] commands = {command , arguments};
-            //String[] env = {"algo=otro"};
-            //File work = new File(workingdirectory);
-            
-            //File work2 = work.getAbsoluteFile();
-            //boolean a = work.exists();
-            //Process p = Runtime.getRuntime().
-            //        exec(onecommand, null, work2);
-
             pr = rt.exec(new File(myWorking, command).getAbsolutePath() + " " + arguments, null, myWorking);
             BufferedReader input =
                 new BufferedReader (new InputStreamReader(pr.getInputStream()));
@@ -304,34 +280,18 @@ public class JobPackage implements Serializable{
             err.printStackTrace();
         }
         
-        
-        /*
-        ProcessBuilder pb = new ProcessBuilder(command, arguments);
-        //pb = pb.directory(new File("./jobs"));
-        
-        //System.out.println("actual: " + pb.directory());
-        //pb.directory(new File("c:\\"));
-        //System.out.println("actual: " + pb.directory());
-        Process process = null;
-        try {
-            process = pb.start();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        InputStream is = process.getInputStream();
-        InputStreamReader isr = new InputStreamReader(is);
-        BufferedReader br = new BufferedReader(isr);
-
-        String line;
-        try {
-            while ((line = br.readLine()) != null) {
-                output = output + line;
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        */
         return output;
     }
 
+    public void downloadZipFile() throws FileNotFoundException, IOException{
+
+        File newFile = new File(this.getZipFileName());
+        System.out.println("File to download : " + newFile.getPath());
+        //create all non exists folders
+        //else you will hit FileNotFoundException for compressed folder
+        new File(newFile.getParent()).mkdirs();
+        FileOutputStream fos = new FileOutputStream(newFile);
+        fos.write(this.getFileContent(), 0, this.getFileContent().length);
+        fos.close();
+    }
 }
