@@ -46,7 +46,7 @@ public class ChordImplExtended extends ChordImpl {
     }
 
 
-    public Serializable retrieveUnique(MyKey key){
+    public Serializable retrieveOneRandom(MyKey key){
         Set<Serializable> unique = retrieve(key);
         if (unique.size()>1){
             System.out.println("Element supposed to have one element had more.");
@@ -59,8 +59,9 @@ public class ChordImplExtended extends ChordImpl {
     }
 
 
-    public Serializable retrieveUnique(ID id){
+    public Serializable retrieveOneRandom(ID id){
         Set<Serializable> unique = retrieve(id);
+        
         if (unique.size()>1){
             System.out.println("Element supposed to have one element had more.");
         }
@@ -70,6 +71,24 @@ public class ChordImplExtended extends ChordImpl {
         }
         return null;
     }
+
+
+
+    public Set<Serializable> retrieveSet(MyKey key){
+        Set<Serializable> unique = retrieve(key);
+        return unique;
+    }
+
+
+    public Set<Serializable> retrieveSet(ID id){
+        Set<Serializable> unique = retrieve(id);
+
+        return unique;
+    }
+
+
+
+
 
     public void insertJobPackage(JobPackage jp, String status){
         this.insert(new MyKey(jp.getDataIdentifier()), jp);
