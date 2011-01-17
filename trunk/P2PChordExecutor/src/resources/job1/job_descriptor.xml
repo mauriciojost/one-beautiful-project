@@ -1,7 +1,7 @@
 
 <job_descriptor job_name="great_job">
-	<subjob step="000" instance="0" name="decompres" filetoexecute="acqua.bat" arguments="decompress11 decompress22"> 
-	<subjob step="01" instance="00" name="calculate1" filetoexecute="acqua.bat" arguments="ccalculate11 calculate22">
-	<subjob step="1" instance="001" name="calculate2" filetoexecute="acqua.bat" arguments="calcualte 33 calculate44">
-	<subjob step="002" instance="0" name="compress" filetoexecute="acqua.bat" arguments="compress11 compress22"> 
+	<subjob step="000" instance="0" name="decompres" filetoexecute="a.bat" arguments="decompress11 decompress22"> 
+	<subjob step="01" instance="00" name="calculate1" filetoexecute="b.bat" arguments="ccalculate11 calculate22">
+	<subjob step="1" instance="001" name="calculate2" filetoexecute="b.bat" arguments="calcualte 33 calculate44">
+	<subjob step="002" instance="0" name="compress" filetoexecute="c.bat" arguments="compress11 compress22"> 
 </job_descriptor>

@@ -2,9 +2,13 @@
 package main;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -66,31 +70,49 @@ public class JobDependencesTree extends Thread{
     @Override
     public void run(){
         int i;
+        byte[] newzip = null;
         for (i=0;i<this.getAmountOfSteps();i++){
             ArrayList<JobPackage> subjobs_of_this_step = this.getSubJobsOfStep(i);
             ArrayList<JobPackage> subjobs_of_this_step_finished;
-            addAllTheseSubjobsToTheChord(subjobs_of_this_step, chord);
+            addAllTheseSubjobsToTheChord(subjobs_of_this_step, chord, newzip);
             checkThatThisSubjobsAreDone(i, subjobs_of_this_step, chord);
             subjobs_of_this_step_finished = getAndDeleteAllTheseSubjobsFromTheChord(subjobs_of_this_step, chord);
-            mergeAllResultsOfTheseSubjobs(subjobs_of_this_step_finished);
+            newzip = mergeAllResultsOfTheseSubjobs(subjobs_of_this_step_finished);
             System.out.println("Finished all the procedures for " + i + "th  step's jobs. Next one...");
             
         }
         System.out.println("Finished all the procedures for this job!! ");
     }
 
-    private void mergeAllResultsOfTheseSubjobs(ArrayList<JobPackage> subjobs_of_this_step_finished){
+    private byte[] mergeAllResultsOfTheseSubjobs(ArrayList<JobPackage> subjobs_of_this_step_finished){
         Iterator<JobPackage> i = subjobs_of_this_step_finished.iterator();
+        JobPackage jp = null;
         while(i.hasNext()){
-            JobPackage jp = i.next();
-            /* Decompres each instance in <place><instance>\... and then put them all together. Then delete those created directories. */
+            jp = i.next();
+            try {
+                /* Decompres each instance in <place><instance>\... and then put them all together. Then delete those created directories. */
+                jp.downloadZipFile();
+                Unzip u = new Unzip(jp.getZipFileName(), jp.getGeneralJobFolder());
+                u.unzipIt();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
         }
+
+        Zip z = new Zip(jp.getGeneralJobFolder(), jp.getZipFileName());
+        z.zip();
+        byte[] newzip = JobPackage.readFile(jp.getZipFileName());
+        return newzip; 
     }
 
-    private void addAllTheseSubjobsToTheChord(ArrayList<JobPackage> subjobs_of_this_step, ChordImplExtended chord){
+    private void addAllTheseSubjobsToTheChord(ArrayList<JobPackage> subjobs_of_this_step, ChordImplExtended chord, byte[] lastzip){
         Iterator<JobPackage> i = subjobs_of_this_step.iterator();
         while(i.hasNext()){
             JobPackage jp = i.next();
+            if (lastzip!=null){
+                jp.setZipFileContent(lastzip);
+            }
             chord.insertJobPackage(jp, JobPackage.STATUS_WAITING);
             jobsEventsListener.addJobRequestedHereEvent(new JobEvent(jp, "sent to chord", Calendar.getInstance().getTime()));
         }

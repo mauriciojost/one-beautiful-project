@@ -1,0 +1,1 @@
+echo holaadsfa %1 %2 > a.txt

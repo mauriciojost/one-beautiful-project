@@ -1,0 +1,1 @@
+echo hola che %1 %2 > c.txt
