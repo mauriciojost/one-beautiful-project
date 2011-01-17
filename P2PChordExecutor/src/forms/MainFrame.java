@@ -97,13 +97,14 @@ public class MainFrame extends javax.swing.JFrame implements EntriesEventListene
         jScrollPane1 = new javax.swing.JScrollPane();
         debuGreportTextArea = new javax.swing.JTextArea();
         showDebugButton = new javax.swing.JToggleButton();
-        continueButton = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Chord's Job Executor");
         setResizable(false);
 
         bootstrapTextField.setText("localhost:8080");
+        bootstrapTextField.setToolTipText("Bootstrap Chord Executor to use to connect to an existing Chord of Executors. ");
         bootstrapTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bootstrapTextFieldActionPerformed(evt);
@@ -111,6 +112,7 @@ public class MainFrame extends javax.swing.JFrame implements EntriesEventListene
         });
 
         localPortTextField.setText("8080");
+        localPortTextField.setToolTipText("Local port which other Chord Executors will connect to. ");
         localPortTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 localPortTextFieldActionPerformed(evt);
@@ -118,6 +120,7 @@ public class MainFrame extends javax.swing.JFrame implements EntriesEventListene
         });
 
         connectButton.setText("Connect");
+        connectButton.setToolTipText("Connect to an existing Chord of Executors.");
         connectButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 connectButtonActionPerformed(evt);
@@ -129,6 +132,7 @@ public class MainFrame extends javax.swing.JFrame implements EntriesEventListene
         jLabel2.setText("Local port:");
 
         initButton.setText("Init chord");
+        initButton.setToolTipText("Init a new Chord of Executors. ");
         initButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 initButtonActionPerformed(evt);
@@ -174,18 +178,14 @@ public class MainFrame extends javax.swing.JFrame implements EntriesEventListene
         jScrollPane1.setViewportView(debuGreportTextArea);
 
         showDebugButton.setText("Debug");
+        showDebugButton.setToolTipText("Debugging.");
         showDebugButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 showDebugButtonActionPerformed(evt);
             }
         });
 
-        continueButton.setText("Next");
-        continueButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                continueButtonActionPerformed(evt);
-            }
-        });
+        jLabel3.setText("M. Jost - S. Mazumdar - Prof. L. Liquori - P2P - Ubinet - Polytech'Nice - 2011");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -197,16 +197,19 @@ public class MainFrame extends javax.swing.JFrame implements EntriesEventListene
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 531, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1)
-                            .addComponent(jLabel2)
-                            .addComponent(statusLable, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(28, 28, 28)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addComponent(bootstrapTextField, javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(localPortTextField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 317, Short.MAX_VALUE))
-                            .addComponent(continueButton, javax.swing.GroupLayout.PREFERRED_SIZE, 319, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(28, 28, 28)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel1)
+                                    .addComponent(jLabel2))
+                                .addGap(28, 28, 28)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addComponent(bootstrapTextField, javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(localPortTextField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 317, Short.MAX_VALUE)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel3)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(statusLable, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(30, 30, 30)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addComponent(connectButton, javax.swing.GroupLayout.DEFAULT_SIZE, 92, Short.MAX_VALUE)
                             .addComponent(initButton, javax.swing.GroupLayout.DEFAULT_SIZE, 92, Short.MAX_VALUE)
@@ -243,8 +246,9 @@ public class MainFrame extends javax.swing.JFrame implements EntriesEventListene
                     .addComponent(showDebugButton, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(2, 2, 2)
-                        .addComponent(statusLable, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(continueButton, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(statusLable, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel3))))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -276,22 +280,28 @@ public class MainFrame extends javax.swing.JFrame implements EntriesEventListene
         String port = this.localPortTextField.getText();
         try {
             localURL = new URL( protocol + "://localhost:"+port+"/");
-        } catch ( MalformedURLException e){
-            throw new RuntimeException (e);
-        }
-
-        chord = new ChordImplExtended();
-        try {
+        
+            chord = new ChordImplExtended();
             chord.create ( localURL );
             this.setStatusLabel("Chord created successfully.");
             this.connectionToChordInstanceDone();
-        } catch ( ServiceException e) {
+        } catch ( Exception e) {
+            chord.leave();
             this.setStatusLabel("Chord creation failed.");
-            throw new RuntimeException (" Could not create DHT !", e);
         }
 
-        
+        continueToNextScreen();
     }//GEN-LAST:event_initButtonActionPerformed
+
+
+    private void continueToNextScreen(){
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new ExecutorForm(chord).setVisible(true);
+            }
+        });
+        this.dispose();
+    }
 
     private void connectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_connectButtonActionPerformed
 
@@ -301,28 +311,25 @@ public class MainFrame extends javax.swing.JFrame implements EntriesEventListene
         URL localURL = null;
         try {
             localURL = new URL( protocol + "://localhost:"+port+"/");
-        } catch ( MalformedURLException e){ throw new RuntimeException (e);}
+        
+            chord = new ChordImplExtended();
+            chord.setURL(localURL);
 
-        chord = new ChordImplExtended();
-        chord.setURL(localURL);
-
-        URL bootstrapURL = null;
-        String bootstrapString = this.bootstrapTextField.getText();
-        try {
+            URL bootstrapURL = null;
+            String bootstrapString = this.bootstrapTextField.getText();
+        
             bootstrapURL = new URL( protocol + "://" + bootstrapString + "/");
-        } catch ( MalformedURLException e){ throw new RuntimeException (e);}
-
-        try {
+        
             chord.join(bootstrapURL);
             this.setStatusLabel("Join done.");
             this.connectionToChordInstanceDone();
-        } catch (ServiceException ex) {
+        } catch (Exception ex) {
             this.setStatusLabel("Join failed.");
-            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
-
+            ex.printStackTrace();
+            chord.leave();
         }
 
-
+        this.continueToNextScreen();
 
     }//GEN-LAST:event_connectButtonActionPerformed
 
@@ -392,15 +399,6 @@ public class MainFrame extends javax.swing.JFrame implements EntriesEventListene
         
     }//GEN-LAST:event_showDebugButtonActionPerformed
 
-    private void continueButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_continueButtonActionPerformed
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new ExecutorForm(chord).setVisible(true);
-            }
-        });
-        this.dispose();
-    }//GEN-LAST:event_continueButtonActionPerformed
-
     private void setDebugButtonsVisibility(boolean b){
         this.debuGinsertButton.setVisible(b);
         this.debuGkeyTextField.setVisible(b);
@@ -426,7 +424,6 @@ public class MainFrame extends javax.swing.JFrame implements EntriesEventListene
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField bootstrapTextField;
     private javax.swing.JButton connectButton;
-    private javax.swing.JButton continueButton;
     private javax.swing.JButton debuGinsertButton;
     private javax.swing.JTextField debuGkeyTextField;
     private javax.swing.JButton debuGremoveButton;
@@ -437,6 +434,7 @@ public class MainFrame extends javax.swing.JFrame implements EntriesEventListene
     private javax.swing.JButton initButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextField localPortTextField;
     private javax.swing.JToggleButton showDebugButton;

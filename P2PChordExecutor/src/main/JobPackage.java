@@ -46,8 +46,16 @@ public class JobPackage implements Serializable{
     private String fileToExecute;
     private String arguments; 
     private String jobFolder;
-    private String generalJobFolder; 
+    private String generalJobFolder;
+    private String realFinishedTime;
 
+    public void setRealFinishedTime(String realFinishedTime) {
+        this.realFinishedTime = realFinishedTime;
+    }
+
+    public String getRealFinishedTime() {
+        return realFinishedTime;
+    }
 
     public void setZipFileContent(byte[] cont){
             zipFileContent = cont;
@@ -75,7 +83,6 @@ public class JobPackage implements Serializable{
         this.subJobName = subjobname;
         this.jobInstance = instance;
         this.jobStep = jobstep;
-        this.output = "<Not finalized yet>";
 
 
         String jobfolder;
@@ -116,7 +123,7 @@ public class JobPackage implements Serializable{
         return zipFileName;
     }
 
-    public static byte[] readFile(String filename){
+    public static byte[] readFile(String filename) throws Exception{
         byte buff[] = null;
         try {
             FileInputStream i = new FileInputStream(filename);
@@ -124,15 +131,14 @@ public class JobPackage implements Serializable{
             i.read(buff);
 
         }catch (Exception e){
-            System.err.println("Cannot open file: " + filename);
-            e.printStackTrace();
+            throw new Exception("Cannot open file: " + filename +". - " + e.toString());
         }
 
         return buff;
     }
 
 
-    public String getJobDescriptorFromFile(String filename){
+    public String getJobDescriptorFromFile(String filename) throws Exception{
         byte[] file = JobPackage.readFile(filename);
         String ret = new String(file);
         return ret; 
@@ -205,7 +211,7 @@ public class JobPackage implements Serializable{
 
     @Override
     public String toString(){
-        return zipFileName + "-" + jobStep + "-" + jobInstance;
+        return zipFileName + "-" +  generalJobName + "-" + subJobName + "-" + jobStep + "-" + jobInstance;
     }
 
     public String getDataIdentifier(){
@@ -254,7 +260,7 @@ public class JobPackage implements Serializable{
 
 
     public static String execute(String workingdirectory, String command, String arguments){
-        String output = "";
+        String output = "Something";
 
         String line;
 

@@ -30,19 +30,24 @@
                   <Component id="jScrollPane1" alignment="1" pref="531" max="32767" attributes="0"/>
                   <Group type="102" max="-2" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="jLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="statusLable" alignment="0" min="-2" pref="15" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace min="-2" pref="28" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="103" groupAlignment="1" max="-2" attributes="0">
-                              <Component id="bootstrapTextField" alignment="0" max="32767" attributes="1"/>
-                              <Component id="localPortTextField" alignment="0" pref="317" max="32767" attributes="1"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="jLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace min="-2" pref="28" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                                  <Component id="bootstrapTextField" alignment="0" max="32767" attributes="1"/>
+                                  <Component id="localPortTextField" alignment="0" pref="317" max="32767" attributes="1"/>
+                              </Group>
                           </Group>
-                          <Component id="continueButton" min="-2" pref="319" max="-2" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="statusLable" min="-2" pref="15" max="-2" attributes="0"/>
+                          </Group>
                       </Group>
-                      <EmptySpace min="-2" pref="28" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="30" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="1" max="-2" attributes="0">
                           <Component id="connectButton" pref="92" max="32767" attributes="1"/>
                           <Component id="initButton" pref="92" max="32767" attributes="1"/>
@@ -90,9 +95,11 @@
                   <Component id="showDebugButton" min="-2" pref="38" max="-2" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
-                      <Component id="statusLable" min="-2" pref="21" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="statusLable" alignment="3" min="-2" pref="21" max="-2" attributes="0"/>
+                          <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
                   </Group>
-                  <Component id="continueButton" alignment="0" min="-2" pref="38" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
@@ -119,6 +126,7 @@
     <Component class="javax.swing.JTextField" name="bootstrapTextField">
       <Properties>
         <Property name="text" type="java.lang.String" value="localhost:8080"/>
+        <Property name="toolTipText" type="java.lang.String" value="Bootstrap Chord Executor to use to connect to an existing Chord of Executors. "/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bootstrapTextFieldActionPerformed"/>
@@ -127,6 +135,7 @@
     <Component class="javax.swing.JTextField" name="localPortTextField">
       <Properties>
         <Property name="text" type="java.lang.String" value="8080"/>
+        <Property name="toolTipText" type="java.lang.String" value="Local port which other Chord Executors will connect to. "/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="localPortTextFieldActionPerformed"/>
@@ -135,6 +144,7 @@
     <Component class="javax.swing.JButton" name="connectButton">
       <Properties>
         <Property name="text" type="java.lang.String" value="Connect"/>
+        <Property name="toolTipText" type="java.lang.String" value="Connect to an existing Chord of Executors."/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="connectButtonActionPerformed"/>
@@ -153,6 +163,7 @@
     <Component class="javax.swing.JButton" name="initButton">
       <Properties>
         <Property name="text" type="java.lang.String" value="Init chord"/>
+        <Property name="toolTipText" type="java.lang.String" value="Init a new Chord of Executors. "/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="initButtonActionPerformed"/>
@@ -229,18 +240,16 @@
     <Component class="javax.swing.JToggleButton" name="showDebugButton">
       <Properties>
         <Property name="text" type="java.lang.String" value="Debug"/>
+        <Property name="toolTipText" type="java.lang.String" value="Debugging."/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="showDebugButtonActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JButton" name="continueButton">
+    <Component class="javax.swing.JLabel" name="jLabel3">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Next"/>
+        <Property name="text" type="java.lang.String" value="M. Jost - S. Mazumdar - Prof. L. Liquori - P2P - Ubinet - Polytech&apos;Nice - 2011"/>
       </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="continueButtonActionPerformed"/>
-      </Events>
     </Component>
   </SubComponents>
 </Form>

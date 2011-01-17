@@ -1,14 +1,10 @@
 
 package main;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,8 +19,8 @@ public class JobDependencesTree extends Thread{
     private String jobDescriptorContent;
     private String zipFileName;
     private ArrayList<JobPackage> subJobsList;
+    private HashMap<String, JobPackage> finishedJobs;
     private ChordImplExtended chord;
-    private int currentStep = 0;
     private JobsEventsListener jobsEventsListener;
 
 
@@ -34,31 +30,11 @@ public class JobDependencesTree extends Thread{
         this.jobDescriptorContent = jp.getJobDescriptorContent();
         this.zipFileName = jp.getPositionedZipFileName();
         subJobsList = this.generateSubJobsList();
+        finishedJobs = new HashMap<String, JobPackage>();
     }
 
-    public JobPackage lookForJobByName(String name){
-        Iterator<JobPackage> i = subJobsList.iterator();
-        while(i.hasNext()){
-            JobPackage curr = i.next();
-            if (curr.getName().equals(name)){
-                return curr; 
-            }
-        }
-        return null;
-    }
-/*
-    public JobDependencesTree (String jobDescriptorContent, String zipFileName){
-        this.jobDescriptorContent = jobDescriptorContent;
-        this.zipFileName = zipFileName;
-        subJobsList = this.generateSubJobsList();
-    }
-*/
-    public static void main(String[] args){
-        //JobPackage jp = new JobPackage("nombre", ".\\src\\resources\\job1.zip", 0, JobPackage.GENERAL_JOB_STEP);
-//        JobDependencesTree jdt = new JobDependencesTree(".\\src\\resources\\job1.zip");
-//        ArrayList<JobPackage> joblist = jdt.generateSubJobsList();
-//        jdt.getAmountOfSteps();
-//        jdt.getSubJobsOfStep(1);
+    public JobPackage lookForFinishedJobByName(String name){
+        return finishedJobs.get(name);
     }
 
     public void startJob(JobsEventsListener jobsEventsListener, ChordImplExtended chord){
@@ -72,19 +48,22 @@ public class JobDependencesTree extends Thread{
         int i;
         byte[] newzip = null;
         for (i=0;i<this.getAmountOfSteps();i++){
-            ArrayList<JobPackage> subjobs_of_this_step = this.getSubJobsOfStep(i);
-            ArrayList<JobPackage> subjobs_of_this_step_finished;
-            addAllTheseSubjobsToTheChord(subjobs_of_this_step, chord, newzip);
-            checkThatThisSubjobsAreDone(i, subjobs_of_this_step, chord);
-            subjobs_of_this_step_finished = getAndDeleteAllTheseSubjobsFromTheChord(subjobs_of_this_step, chord);
-            newzip = mergeAllResultsOfTheseSubjobs(subjobs_of_this_step_finished);
-            System.out.println("Finished all the procedures for " + i + "th  step's jobs. Next one...");
-            
+            try{
+                ArrayList<JobPackage> subjobs_of_this_step = this.getSubJobsOfStep(i);
+                ArrayList<JobPackage> subjobs_of_this_step_finished;
+                addAllTheseSubjobsToTheChord(subjobs_of_this_step, chord, newzip);
+                checkThatThisSubjobsAreDone(i, subjobs_of_this_step, chord);
+                subjobs_of_this_step_finished = getAndDeleteAllTheseSubjobsFromTheChord(subjobs_of_this_step, chord);
+                newzip = mergeAllResultsOfTheseSubjobs(subjobs_of_this_step_finished);
+                System.out.println("Finished all the procedures for " + i + "th  step's jobs. Next one...");
+            }catch(Exception e){
+                e.printStackTrace();
+            }
         }
         System.out.println("Finished all the procedures for this job!! ");
     }
 
-    private byte[] mergeAllResultsOfTheseSubjobs(ArrayList<JobPackage> subjobs_of_this_step_finished){
+    private byte[] mergeAllResultsOfTheseSubjobs(ArrayList<JobPackage> subjobs_of_this_step_finished) throws Exception{
         Iterator<JobPackage> i = subjobs_of_this_step_finished.iterator();
         JobPackage jp = null;
         while(i.hasNext()){
@@ -97,7 +76,6 @@ public class JobDependencesTree extends Thread{
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
         }
 
         Zip z = new Zip(jp.getGeneralJobFolder(), jp.getZipFileName());
@@ -133,7 +111,7 @@ public class JobDependencesTree extends Thread{
                     System.out.println("Not ready...");
                 }else{
                     System.out.println("Ready!!!");
-                    this.jobsEventsListener.addJobRequestedHereEvent(new JobEvent(jp, "finished", Calendar.getInstance().getTime()));
+                    this.jobsEventsListener.addJobRequestedHereEvent(new JobEvent(jp, "notified finished", Calendar.getInstance().getTime()));
                 }
             }
             if(not_finished_jobs>0){
@@ -147,7 +125,6 @@ public class JobDependencesTree extends Thread{
                 return;
             }
         }
-
     }
 
     private ArrayList<JobPackage> getAndDeleteAllTheseSubjobsFromTheChord(ArrayList<JobPackage> subjobs_of_this_step, ChordImplExtended chord){
@@ -158,14 +135,13 @@ public class JobDependencesTree extends Thread{
             JobPackage oldjp = i.next();
             JobPackage newjp = (JobPackage) chord.retrieveUnique(new MyKey(oldjp.getDataIdentifier()));
             procesed_jobs.add(newjp);
-            chord.removeJobPackage(oldjp);
+            
+            finishedJobs.put(newjp.getName(), newjp);
+            //chord.removeJobPackage(oldjp);
+            chord.removeJobPackage(newjp);
             System.out.println("Removed job '" + oldjp.getName() + "' from the chord.");
         }
         return procesed_jobs;
-    }
-
-    private void mergeAllResultsOfTheseSubjobs(ArrayList<JobPackage> subjobs_of_this_step, ChordImplExtended chord){
-        
     }
 
     private ArrayList<JobPackage> generateSubJobsList() throws Exception{
@@ -178,6 +154,8 @@ public class JobDependencesTree extends Thread{
             jobname = m.group(1);
         }
 
+        jobname = jobname + "_" +Calendar.getInstance().getTime().getSeconds()+
+                Calendar.getInstance().getTime().getMinutes(); 
 
         strMatch = Pattern.compile("(<subjob step=\"\\d*?\" instance=\"\\d*?\" name=\".*?\" filetoexecute=\".*?\" arguments=\".*?\">)");
         m = strMatch.matcher(jobDescriptorContent);
@@ -239,23 +217,4 @@ public class JobDependencesTree extends Thread{
         return sj; 
     }
 
-    protected String rawFileContent;
-
-    /* Open a file and give its content in a String. */
-    public String readFile(String filename){
-        String str =  null;
-        try {
-            FileInputStream i = new FileInputStream(filename);
-            byte buff[] = new byte[i.available()];
-            i.read(buff);
-            i.close();
-            str = new String(buff);
-        }catch (Exception e){
-            System.err.println("Cannot open file: " + filename);
-            e.printStackTrace();
-        }
-
-        rawFileContent = str;
-        return str;
-    }
 }
