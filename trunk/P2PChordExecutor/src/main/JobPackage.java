@@ -9,6 +9,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class JobPackage implements Serializable{
 
@@ -40,25 +42,31 @@ public class JobPackage implements Serializable{
     private byte[] zipFileContent;
     private String jobDescriptorContent;
     private String output;
-    private String executionCommand;
+    private String fileToExecute;
+    private String arguments; 
     private String jobFolder;
 
-    public static void main(String[] args){
-        //JobPackage jp = new JobPackage("nombre", ".\\src\\resources\\job1.zip", 0, 0);
-        System.out.println(" ");
-    }
 
     public void setZipFileContent(byte[] cont){
             zipFileContent = cont;
     }
     
-    public void setExecutionCommand(String command){
-        this.executionCommand = command;
+    public void setFileToExecute(String command){
+        this.fileToExecute = command;
     }
 
-    public String getExecutionCommand(){
-        return this.executionCommand;
+    public String getFileToExecute(){
+        return this.fileToExecute;
     }
+
+    public void setArguments(String arg){
+        this.arguments = arg;
+    }
+
+    public String getArguments(){
+        return this.arguments;
+    }
+
 
     public JobPackage(String jobname, String subjobname, String zipfilename, int instance, int jobstep) throws Exception{
         this.generalJobName = jobname;
@@ -237,12 +245,73 @@ public class JobPackage implements Serializable{
         }
     }
 
-    public static String execute(String workingdirectory, String command){
+
+    public static void main(String[] args){
+        JobPackage.execute("C:\\", "hola.bat", "1 2 3");
+    }
+
+    public static String execute(String workingdirectory, String command, String arguments){
         String output = "";
 
-        ProcessBuilder pb = new ProcessBuilder(command);
-        pb.directory(new File(workingdirectory));
+        /*
+        Runtime rt = Runtime.getRuntime();
+        Process pr = null;
+        File myFolder = new File("C:\\");
+        try {
+            pr = rt.exec(new File(myFolder, "hola.bat").getAbsolutePath(), null, myFolder);
+        } catch (IOException ex) {
+            Logger.getLogger(JobPackage.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try {
+            pr.waitFor();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(JobPackage.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        pr.destroy();
+        */
 
+        String line;
+
+        Runtime rt = Runtime.getRuntime();
+        Process pr = null;
+        File myWorking = new File(workingdirectory);
+
+
+        try{
+            
+            //String[] commands = {command , arguments};
+            //String[] env = {"algo=otro"};
+            //File work = new File(workingdirectory);
+            
+            //File work2 = work.getAbsoluteFile();
+            //boolean a = work.exists();
+            //Process p = Runtime.getRuntime().
+            //        exec(onecommand, null, work2);
+
+            pr = rt.exec(new File(myWorking, command).getAbsolutePath() + " " + arguments, null, myWorking);
+            BufferedReader input =
+                new BufferedReader (new InputStreamReader(pr.getInputStream()));
+
+            while ((line = input.readLine()) != null){
+                output = output + line;
+            }
+
+            pr.waitFor();
+            input.close();
+
+            pr.destroy();
+        }catch (Exception err){
+            err.printStackTrace();
+        }
+        
+        
+        /*
+        ProcessBuilder pb = new ProcessBuilder(command, arguments);
+        //pb = pb.directory(new File("./jobs"));
+        
+        //System.out.println("actual: " + pb.directory());
+        //pb.directory(new File("c:\\"));
+        //System.out.println("actual: " + pb.directory());
         Process process = null;
         try {
             process = pb.start();
@@ -261,7 +330,7 @@ public class JobPackage implements Serializable{
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-
+        */
         return output;
     }
 

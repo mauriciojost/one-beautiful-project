@@ -156,7 +156,8 @@ public class JobDependencesTree extends Thread{
             jobname = m.group(1);
         }
 
-        strMatch = Pattern.compile( "(<subjob step=\\d*? instance=\\d*? name=\".*?\">.*?</subjob>)");
+
+        strMatch = Pattern.compile("(<subjob step=\"\\d*?\" instance=\"\\d*?\" name=\".*?\" filetoexecute=\".*?\" arguments=\".*?\">)");
         m = strMatch.matcher(jobDescriptorContent);
         while(m.find()){
             String subjob = m.group(1);
@@ -197,15 +198,18 @@ public class JobDependencesTree extends Thread{
         <subjob step=(\d*?) instance=(\d*?) name="(.*?)">(.*?)</subjob>
          */
         JobPackage sj = null;
-        Pattern strMatch = Pattern.compile( "<subjob step=(\\d*?) instance=(\\d*?) name=\"(.*?)\">(.*?)</subjob>");
+
+        Pattern strMatch = Pattern.compile( "<subjob step=\"(\\d*?)\" instance=\"(\\d*?)\" name=\"(.*?)\" filetoexecute=\"(.*?)\" arguments=\"(.*?)\">");
         Matcher m = strMatch.matcher(subjobstr);
         if(m.find()){
             int step = Integer.valueOf(m.group(1));
             int instance = Integer.valueOf(m.group(2));
             String name = m.group(3);
-            String execution = m.group(4);
+            String filetoexecute = m.group(4);
+            String arguments = m.group(5);
             sj = new JobPackage(general_job_name, name, filename, instance, step);
-            sj.setExecutionCommand(execution);
+            sj.setFileToExecute(filetoexecute);
+            sj.setArguments(arguments);
         }
         else{
             System.err.println("Cannot parse as a sub job: " + subjobstr);

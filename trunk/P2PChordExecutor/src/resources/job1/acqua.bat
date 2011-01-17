@@ -1,1 +1,1 @@
-echo "hola %1 %2 %3" > salida.txt
+echo hola %1 %2 > salida.txt
