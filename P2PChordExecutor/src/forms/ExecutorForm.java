@@ -154,9 +154,10 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
                         chord.remove(new MyKey(job.getDataIdentifier()), job);
 
                         executedHere.add(new JobEvent(job, "started", Calendar.getInstance().getTime()));
-                        executeTask(job);
+                        job = executeTask(job);
                         executedHere.add(new JobEvent(job, "finished", Calendar.getInstance().getTime()));
 
+                        chord.insert(new MyKey(job.getDataIdentifier()), job);
                         chord.remove(status_key, status);
                         chord.insert(status_key, JobPackage.STATUS_DONE);
                     }
@@ -177,7 +178,9 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
                     0,
                     JobPackage.PARTICULAR_SUBJOB_STEP);
                    
-            String output = JobPackage.execute(jpmaterial.getJobFolder(), jpmaterial.getJobFolder() + File.separator + jpvirtual.getExecutionCommand());
+            String output = JobPackage.execute(jpmaterial.getJobFolder(), 
+                    jpvirtual.getFileToExecute(),
+                    jpvirtual.getArguments());
 
             Zip comp = new Zip(jpmaterial.getJobFolder(), jpmaterial.getZipFileName());
             comp.zip();
