@@ -36,6 +36,7 @@ import main.Parser;
 import main.Zip;
 
 public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListener, MouseListener{
+
     private ChordImplExtended chord;
 
     private final int PROCESS_NAME = 0;
@@ -375,17 +376,19 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
     private void addJobButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addJobButtonActionPerformed
 
 
-        final JFileChooser fc = new JFileChooser();
-        int returnVal = fc.showOpenDialog(this);
+//        final JFileChooser fc = new JFileChooser();
+//        int returnVal = fc.showOpenDialog(this);
+//
+//        if (returnVal == JFileChooser.APPROVE_OPTION) {
+//            File zip = fc.getSelectedFile();
 
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-            File zip = fc.getSelectedFile();
-            //String zip = ".\\src\\resources\\job1.zip";
+
+            File zip = new File(".\\src\\resources\\job1.zip");
             addJobRequestedHere(zip.getPath());
-
-        } else {
-            outputText.setText("Action cancelled by the user.");
-        }
+//
+//        } else {
+//            outputText.setText("Action cancelled by the user.");
+//        }
 
     }//GEN-LAST:event_addJobButtonActionPerformed
 

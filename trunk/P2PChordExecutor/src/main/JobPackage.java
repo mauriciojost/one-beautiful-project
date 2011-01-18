@@ -288,7 +288,7 @@ public class JobPackage implements Serializable{
                 new BufferedReader (new InputStreamReader(pr.getInputStream()));
 
             while ((line = input.readLine()) != null){
-                output = output + line;
+                output = output + line + "\n";
             }
 
             pr.waitFor();
