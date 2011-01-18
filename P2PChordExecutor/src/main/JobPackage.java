@@ -50,6 +50,17 @@ public class JobPackage implements Serializable{
     private String jobFolder;
     private String generalJobFolder;
     private String realFinishedTime;
+    private String auxiliaryData;
+
+    public String getAuxiliaryData() {
+        return auxiliaryData;
+    }
+
+    public void setAuxiliaryData(String auxiliaryData) {
+        this.auxiliaryData = auxiliaryData;
+    }
+
+    
 
     public void setRealFinishedTime(String realFinishedTime) {
         this.realFinishedTime = realFinishedTime;
@@ -262,7 +273,7 @@ public class JobPackage implements Serializable{
 
 
     public static String execute(String workingdirectory, String command, String arguments){
-        String output = "Something";
+        String output = "";
 
         String line;
 

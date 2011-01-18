@@ -111,7 +111,10 @@ public class JobDependencesTree extends Thread{
                     System.out.println("Not ready...");
                 }else{
                     System.out.println("Ready!!!");
-                    this.jobsEventsListener.addJobRequestedHereEvent(new JobEvent(jp, "notified finished", Calendar.getInstance().getTime()));
+                    if (jp.getAuxiliaryData()==null){
+                        this.jobsEventsListener.addJobRequestedHereEvent(new JobEvent(jp, "notified finished", Calendar.getInstance().getTime()));
+                        jp.setAuxiliaryData("Already notified change");
+                    }
                 }
             }
             if(not_finished_jobs>0){
