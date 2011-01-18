@@ -1,7 +1,12 @@
 
-<job_descriptor job_name="great_job">
-	<subjob step="000" instance="0" name="decompres" filetoexecute="a.bat" arguments="decompress11 decompress22"> 
-	<subjob step="01" instance="00" name="calculate1" filetoexecute="b.bat" arguments="ccalculate11 calculate22">
-	<subjob step="1" instance="001" name="calculate2" filetoexecute="b.bat" arguments="calcualte 33 calculate44">
-	<subjob step="002" instance="0" name="compress" filetoexecute="c.bat" arguments="compress11 compress22"> 
+<!-- Name of the job. -->
+<job_descriptor job_name="p2pjob">
+	<!-- Workflow. To denote dependance we use steps (two subjobs in the same step can be executed parallelly). -->
+	<!-- Name of each subjob. -->
+	<subjob step="0" instance="0" name="subjobA" filetoexecute="a.bat" arguments="sjobAparam1 sjobAparam2"> 
+	<!-- sjobB and sjobC will be executed in parallel. -->
+	<subjob step="1" instance="0" name="subjobB" filetoexecute="b.bat" arguments="sjobBparam1 sjobBparam2">
+	<subjob step="1" instance="1" name="subjobC" filetoexecute="c.bat" arguments="sjobCparam1 sjobCparam2">
+	<!-- sjobD will way for both before start (and will get all the files they have generated). -->
+	<subjob step="2" instance="0" name="subjobD" filetoexecute="d.bat" arguments="sjobDparam1 sjobDparam2"> 
 </job_descriptor>

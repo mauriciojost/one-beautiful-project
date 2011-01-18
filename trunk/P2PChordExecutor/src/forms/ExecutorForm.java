@@ -43,7 +43,7 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
 
     private final int UPGRADE_TIME_MS = 4000; 
     private ArrayList<JobEvent> jobsRequestedHereEvents;
-    private ArrayList<JobEvent> foreignJobsExecutedHere;
+    private ArrayList<JobEvent> foreignJobssExecutedHere;
     private ArrayList<JobDependencesTree> jobs;
 
     static{
@@ -73,7 +73,7 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
         setLocallyRequestedJobsTableCell("Name", -1, this.PROCESS_NAME);
         //setLocallyRequestedJobsTableCell("Status", -1, this.PROCESS_STATUS);
         jobs = new ArrayList<JobDependencesTree>();
-        foreignJobsExecutedHere = new ArrayList<JobEvent>();
+        foreignJobssExecutedHere = new ArrayList<JobEvent>();
         jobsRequestedHereEvents = new ArrayList<JobEvent>();
 
         String[] columnNames = {"Job", "Event", "Time"};
@@ -97,6 +97,11 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
 
     }
 
+
+    private void addEventToForeignJobsExecutedHere(JobEvent je){
+        foreignJobssExecutedHere.add(je);
+        this.refreshForeignJobsExecutedHereTable();
+    }
     private void initSystem(){
         
         Thread t = new Thread(new Runnable(){
@@ -105,8 +110,8 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
                     try{
                         Thread.sleep(UPGRADE_TIME_MS);
                         ArrayList<ID> ids = Parser.getParser().getAllIDs(chord.printEntries());
-                        checkForPendingTasks(ids, foreignJobsExecutedHere);
-                        refreshForeignJobsExecutedHereTable(foreignJobsExecutedHere);
+                        checkForPendingTasks(ids);
+                        refreshForeignJobsExecutedHereTable();
                     }catch(Exception e){
                         e.printStackTrace();
                     }
@@ -117,7 +122,7 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
 
     }
 
-    private void checkForPendingTasks(ArrayList<ID> localIDs, ArrayList<JobEvent> executedHere){
+    private void checkForPendingTasks(ArrayList<ID> localIDs){
         /* Here we check if there are pending tasks to execute.
          * If there is key whose value is not one status string, it is a
          * task to execute.
@@ -144,10 +149,13 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
 
                         chord.remove(new MyKey(job.getDataIdentifier()), job);
 
-                        executedHere.add(new JobEvent(job, "started", Calendar.getInstance().getTime()));
+                        this.addEventToForeignJobsExecutedHere(new JobEvent(job, "started", Calendar.getInstance().getTime()));
+                        
                         job = executeTask(job);
                         System.out.println("Output of the job: \n" + job.getOutput());
-                        executedHere.add(new JobEvent(job, "finished", Calendar.getInstance().getTime()));
+                        this.addEventToForeignJobsExecutedHere(
+                                new JobEvent(job, "finished", Calendar.getInstance().getTime()));
+                        
 
                         chord.insert(new MyKey(job.getDataIdentifier()), job);
                         chord.remove(status_key, status);
@@ -206,6 +214,7 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
         jScrollPane1 = new javax.swing.JScrollPane();
         outputText = new javax.swing.JTextArea();
         jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("ChordExecutor");
@@ -303,7 +312,8 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
 
         outputText.setBackground(new java.awt.Color(0, 0, 0));
         outputText.setColumns(20);
-        outputText.setForeground(new java.awt.Color(255, 255, 255));
+        outputText.setFont(new java.awt.Font("Monospaced", 0, 11)); // NOI18N
+        outputText.setForeground(new java.awt.Color(204, 204, 204));
         outputText.setLineWrap(true);
         outputText.setRows(5);
         outputText.setWrapStyleWord(true);
@@ -311,17 +321,17 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
 
         jLabel3.setText("Details (locally requested jobs)");
 
+        jLabel4.setText("M. Jost - S. Mazumdar - Prof. L. Liquori - P2P - Ubinet - Polytech'Nice - 2011");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 879, Short.MAX_VALUE)
-                        .addContainerGap())
-                    .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 879, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel1)
@@ -331,11 +341,12 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
                         .addGap(66, 66, 66)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel2))
-                        .addContainerGap())
-                    .addGroup(layout.createSequentialGroup()
+                            .addComponent(jLabel2)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(jLabel3)
-                        .addContainerGap(742, Short.MAX_VALUE))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 369, Short.MAX_VALUE)
+                        .addComponent(jLabel4)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -349,11 +360,13 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addComponent(jLabel3)
-                .addGap(9, 9, 9)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 254, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(32, 32, 32)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(jLabel4))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 243, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pack();
@@ -401,6 +414,7 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
@@ -434,13 +448,16 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
 
 
 
-    private void refreshForeignJobsExecutedHereTable(ArrayList<JobEvent> events){
+    private void refreshForeignJobsExecutedHereTable(){
         int i;
 
-        for (i=0;i<events.size();i++){
-            this.setForeignJobsExecutedHereTableCell(events.get(i).getJob().getName(), i, 0);
-            this.setForeignJobsExecutedHereTableCell(events.get(i).getEvent(), i, 1);
-            this.setForeignJobsExecutedHereTableCell(events.get(i).getWhen().getHours() + ":" + events.get(i).getWhen().getMinutes() + ":" + events.get(i).getWhen().getSeconds(), i, 2);
+        for (i=0;i<foreignJobssExecutedHere.size();i++){
+            this.setForeignJobsExecutedHereTableCell(foreignJobssExecutedHere.get(i).getJob().getName(), i, 0);
+            this.setForeignJobsExecutedHereTableCell(foreignJobssExecutedHere.get(i).getEvent(), i, 1);
+            this.setForeignJobsExecutedHereTableCell(
+                    foreignJobssExecutedHere.get(i).getWhen().getHours() + ":" +
+                    foreignJobssExecutedHere.get(i).getWhen().getMinutes() + ":" +
+                    foreignJobssExecutedHere.get(i).getWhen().getSeconds(), i, 2);
         }
     }
     private void setForeignJobsExecutedHereTableCell(String text, int row, int column){
