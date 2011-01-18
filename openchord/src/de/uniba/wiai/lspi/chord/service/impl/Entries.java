@@ -33,7 +33,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.Collection;
 
 import de.uniba.wiai.lspi.chord.com.Entry;
 import de.uniba.wiai.lspi.chord.data.ID;
@@ -58,14 +57,13 @@ import de.uniba.wiai.lspi.util.logging.Logger;
  * synchronized statement, when iterating over it. TODO: What about fairness?
  * sven
  */
-public class Entries {
+final class Entries {
 
 	/**
 	 * Object logger.
 	 */
 	private final static Logger logger = Logger.getLogger(Entries.class);
 
-	private EntriesEventListener eventListener = null; 
 	private final static boolean debugEnabled = logger
 			.isEnabledFor(Logger.LogLevel.DEBUG);
 
@@ -102,10 +100,9 @@ public class Entries {
 		}
 
 		for (Entry nextEntry : entriesToAdd) {
-			this.notifyEvent(EntriesEventListener.ENTRY_ADDED, nextEntry);
 			this.add(nextEntry);
 		}
-		
+
 		if (debugEnabled) {
 			Entries.logger.debug("Set of entries of length "
 					+ entriesToAdd.size() + " was added.");
@@ -120,7 +117,7 @@ public class Entries {
 	 * @throws NullPointerException
 	 *             If entry to add is <code>null</code>.
 	 */
-	public final void add(Entry entryToAdd) {
+	final void add(Entry entryToAdd) {
 		
 		if (entryToAdd == null) {
 			NullPointerException e = new NullPointerException(
@@ -137,12 +134,8 @@ public class Entries {
 				values = new HashSet<Entry>();
 				this.entries.put(entryToAdd.getId(), values);
 			}
-			this.notifyEvent(EntriesEventListener.ENTRY_ADDED, entryToAdd);
 			values.add(entryToAdd);
 		}
-		
-		
-		
 		if (debugEnabled) {
 			Entries.logger.debug("Entry was added: " + entryToAdd);
 		}
@@ -156,7 +149,7 @@ public class Entries {
 	 * @throws NullPointerException
 	 *             If entry to remove is <code>null</code>.
 	 */
-	public final void remove(Entry entryToRemove) {
+	final void remove(Entry entryToRemove) {
 		
 		if (entryToRemove == null) {
 			NullPointerException e = new NullPointerException(
@@ -169,33 +162,16 @@ public class Entries {
 			if (this.entries.containsKey(entryToRemove.getId())) {
 				Set<Entry> values = this.entries.get(entryToRemove.getId());
 				values.remove(entryToRemove);
-				this.notifyEvent(EntriesEventListener.ENTRY_REMOVED, entryToRemove);
 				if (values.size() == 0) {
 					this.entries.remove(entryToRemove.getId());
 				}
 			}
 		}
-		
-		
-		
 		if (debugEnabled) {
 			Entries.logger.debug("Entry was removed: " + entryToRemove);
 		}
 	}
 
-	/* It returs a SET of entries. */
-	public final Collection getValues() {
-		synchronized (this.entries) {
-			Collection entriesForID = this.entries.values();
-			
-			if (debugEnabled) {
-				Entries.logger.debug("Returning entries " + entriesForID);
-			}
-			return entriesForID;
-		}
-	}
-
-	
 	/**
 	 * Returns a set of entries matching the given ID. If no entries match the
 	 * given ID, an empty set is returned.
@@ -207,7 +183,7 @@ public class Entries {
 	 * @return Set of matching entries. Empty Set if no matching entries are
 	 *         available.
 	 */
-	public final Set<Entry> getEntries(ID id) {
+	final Set<Entry> getEntries(ID id) {
 
 		if (id == null) {
 			NullPointerException e = new NullPointerException(
@@ -305,12 +281,9 @@ public class Entries {
 		}
 
 		for (Entry nextEntry : toRemove) {
-			this.notifyEvent(EntriesEventListener.ENTRY_REMOVED, nextEntry);
 			this.remove(nextEntry);
 		}
-		
-		
-		
+
 		if (debugEnabled) {
 			Entries.logger.debug("Set of entries of length " + toRemove.size()
 					+ " was removed.");
@@ -347,15 +320,5 @@ public class Entries {
 					+ ", value = " + entry.getValue() + "\n");
 		}
 		return result.toString();
-	}
-	
-	public void setEventListener(EntriesEventListener e){
-		this.eventListener = e; 
-	}
-	
-	public void notifyEvent(int event, Object value){
-		if (eventListener!=null){
-			eventListener.newEvent(event, value);
-		}
 	}
 }

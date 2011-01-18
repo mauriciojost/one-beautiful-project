@@ -140,7 +140,7 @@ public class ChordImpl implements Chord, Report, AsynChord {
 	/**
 	 * Entries stored at this node, including replicas.
 	 */
-	protected Entries entries;
+	private Entries entries;
 
 	/**
 	 * Executor service for local maintenance tasks.
@@ -1163,8 +1163,6 @@ public class ChordImpl implements Chord, Report, AsynChord {
 		});
 	}
 
-	
-	
 	public void remove(final Key key, final Serializable entry,
 			final ChordCallback callback) {
 		final Chord chord = this;
@@ -1193,10 +1191,6 @@ public class ChordImpl implements Chord, Report, AsynChord {
 
 	public ChordFuture removeAsync(Key key, Serializable entry) {
 		return ChordRemoveFuture.create(this.asyncExecutor, this, key, entry);
-	}
-	
-	public Entries getEntries(){
-		return entries; 
 	}
 
 }
