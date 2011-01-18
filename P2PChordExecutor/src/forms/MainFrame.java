@@ -32,7 +32,7 @@ import main.*;
  *
  * @author Mauricio
  */
-public class MainFrame extends javax.swing.JFrame implements EntriesEventListener{
+public class MainFrame extends javax.swing.JFrame{
     private ChordImplExtended chord = null;
 
     static{
