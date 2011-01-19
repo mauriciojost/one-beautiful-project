@@ -103,7 +103,7 @@ public class MainFrame extends javax.swing.JFrame{
         setTitle("Chord's Job Executor");
         setResizable(false);
 
-        bootstrapTextField.setText("localhost:8080");
+        bootstrapTextField.setText("192.168.1.1:8080");
         bootstrapTextField.setToolTipText("Bootstrap Chord Executor to use to connect to an existing Chord of Executors. ");
         bootstrapTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -111,7 +111,7 @@ public class MainFrame extends javax.swing.JFrame{
             }
         });
 
-        localPortTextField.setText("8080");
+        localPortTextField.setText("192.168.1.1:8080");
         localPortTextField.setToolTipText("Local port which other Chord Executors will connect to. ");
         localPortTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -279,7 +279,7 @@ public class MainFrame extends javax.swing.JFrame{
         URL localURL = null;
         String port = this.localPortTextField.getText();
         try {
-            localURL = new URL( protocol + "://localhost:"+port+"/");
+            localURL = new URL( protocol + "://"+port+"/");
         
             chord = new ChordImplExtended();
             chord.create ( localURL );
@@ -310,7 +310,7 @@ public class MainFrame extends javax.swing.JFrame{
         String port = this.localPortTextField.getText();
         URL localURL = null;
         try {
-            localURL = new URL( protocol + "://localhost:"+port+"/");
+            localURL = new URL( protocol + "://"+port+"/");
         
             chord = new ChordImplExtended();
             chord.setURL(localURL);
