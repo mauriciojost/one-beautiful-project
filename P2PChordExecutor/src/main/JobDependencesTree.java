@@ -29,7 +29,7 @@ public class JobDependencesTree extends Thread{
         JobPackage jp = new JobPackage("main", "main", zipFileName, 0, JobPackage.GENERAL_JOB_STEP);
         this.jobDescriptorContent = jp.getJobDescriptorContent();
         this.zipFileName = jp.getPositionedZipFileName();
-        subJobsList = this.generateSubJobsList();
+        subJobsList = this.generateSubJobsList(jobDescriptorContent);
         finishedJobs = new HashMap<String, JobPackage>();
     }
 
@@ -147,12 +147,12 @@ public class JobDependencesTree extends Thread{
         return procesed_jobs;
     }
 
-    private ArrayList<JobPackage> generateSubJobsList() throws Exception{
+    private ArrayList<JobPackage> generateSubJobsList(String descriptorContent) throws Exception{
         ArrayList<JobPackage> subjobs = new ArrayList<JobPackage>();
         String jobname = "defaultjobname";
 
         Pattern strMatch = Pattern.compile( "<job_descriptor job_name=\"(.*?)\">");
-        Matcher m = strMatch.matcher(jobDescriptorContent);
+        Matcher m = strMatch.matcher(descriptorContent);
         while(m.find()){
             jobname = m.group(1);
         }
@@ -161,7 +161,7 @@ public class JobDependencesTree extends Thread{
                 Calendar.getInstance().getTime().getMinutes(); 
 
         strMatch = Pattern.compile("(<subjob step=\"\\d*?\" instance=\"\\d*?\" name=\".*?\" filetoexecute=\".*?\" arguments=\".*?\">)");
-        m = strMatch.matcher(jobDescriptorContent);
+        m = strMatch.matcher(descriptorContent);
         while(m.find()){
             String subjob = m.group(1);
             JobPackage sj = this.generateSubJob(jobname, subjob, zipFileName);
@@ -196,7 +196,7 @@ public class JobDependencesTree extends Thread{
         return max+1;
     }
 
-    private JobPackage generateSubJob(String general_job_name, String subjobstr, String filename) throws Exception{
+    private JobPackage generateSubJob(String general_job_name, String subjobstr, String zipfilename) throws Exception{
         /*
         <subjob step=(\d*?) instance=(\d*?) name="(.*?)">(.*?)</subjob>
          */
@@ -210,7 +210,7 @@ public class JobDependencesTree extends Thread{
             String name = m.group(3);
             String filetoexecute = m.group(4);
             String arguments = m.group(5);
-            sj = new JobPackage(general_job_name, name, filename, instance, step);
+            sj = new JobPackage(general_job_name, name, zipfilename, instance, step);
             sj.setFileToExecute(filetoexecute);
             sj.setArguments(arguments);
         }

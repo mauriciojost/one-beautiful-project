@@ -103,7 +103,7 @@ public class MainFrame extends javax.swing.JFrame{
         setTitle("Chord's Job Executor");
         setResizable(false);
 
-        bootstrapTextField.setText("192.168.1.1:8080");
+        bootstrapTextField.setText("localhost:8080");
         bootstrapTextField.setToolTipText("Bootstrap Chord Executor to use to connect to an existing Chord of Executors. ");
         bootstrapTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -111,7 +111,7 @@ public class MainFrame extends javax.swing.JFrame{
             }
         });
 
-        localPortTextField.setText("192.168.1.1:8080");
+        localPortTextField.setText("localhost:8080");
         localPortTextField.setToolTipText("Local port which other Chord Executors will connect to. ");
         localPortTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -285,12 +285,13 @@ public class MainFrame extends javax.swing.JFrame{
             chord.create ( localURL );
             this.setStatusLabel("Chord created successfully.");
             this.connectionToChordInstanceDone();
+            continueToNextScreen();
         } catch ( Exception e) {
             chord.leave();
             this.setStatusLabel("Chord creation failed.");
         }
 
-        continueToNextScreen();
+        
     }//GEN-LAST:event_initButtonActionPerformed
 
 
@@ -323,13 +324,12 @@ public class MainFrame extends javax.swing.JFrame{
             chord.join(bootstrapURL);
             this.setStatusLabel("Join done.");
             this.connectionToChordInstanceDone();
+            this.continueToNextScreen();
         } catch (Exception ex) {
             this.setStatusLabel("Join failed.");
             ex.printStackTrace();
             chord.leave();
         }
-
-        this.continueToNextScreen();
 
     }//GEN-LAST:event_connectButtonActionPerformed
 
