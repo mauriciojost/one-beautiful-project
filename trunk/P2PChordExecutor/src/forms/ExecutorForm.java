@@ -168,30 +168,33 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
         
     }
 
-    private JobPackage executeTask(JobPackage jpvirtual){
+    private JobPackage executeTask(JobPackage jporiginal){
 
         JobPackage processed=null;
         try{
-            jpvirtual.downloadZipFile();
-            JobPackage jpmaterial = new JobPackage(jpvirtual.getGeneralJobName(),
-                    jpvirtual.getName(),
-                    jpvirtual.getZipFileName(),
+            jporiginal.downloadZipFile();
+
+            jporiginal.downloadToExecute();
+
+            /*JobPackage jpmaterial = new JobPackage(jporiginal.getGeneralJobName(),
+                    jporiginal.getName(),
+                    jporiginal.getZipFileName(),
                     0,
                     JobPackage.PARTICULAR_SUBJOB_STEP);
-                   
-            String output = JobPackage.execute(jpmaterial.getJobFolder(), 
-                    jpvirtual.getFileToExecute(),
-                    jpvirtual.getArguments());
+              */
+            String output = JobPackage.execute(jporiginal/*material*/.getSpecificJobFolder(),
+                    jporiginal.getFileToExecute(),
+                    jporiginal.getArguments());
 
 
-            Zip comp = new Zip(jpmaterial.getJobFolder(), jpmaterial.getZipFileName());
+            Zip comp = new Zip(/*jpmaterial*/jporiginal.getSpecificJobFolder(), /*jpmaterial*/jporiginal.getZipFileName());
             comp.zip();
 
-            jpvirtual.setZipFileContent(JobPackage.readFile(jpmaterial.getZipFileName()));
-            jpvirtual.setOutput(output);
-            jpvirtual.setRealFinishedTime(Calendar.getInstance().getTime().toString());
+            jporiginal.setZipFileContent(JobPackage.readFile(/*jpmaterial*/jporiginal.getZipFileName()));
+            jporiginal.setOutput(output);
+            jporiginal.setRealFinishedTime(Calendar.getInstance().getTime().toString());
 
-            processed = jpvirtual; 
+            processed = jporiginal;
             //put_content_in_jpvirtual_again;
         }catch(Exception e){
             e.printStackTrace();
@@ -505,7 +508,7 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
                         "\nGeneral job name: " + jp.getGeneralJobName() +
                         "\nJob name: " + jp.getName() +
                         "\nGeneral job folder: " + jp.getGeneralJobFolder() +
-                        "\nSpecific job folder: " + jp.getJobFolder() +
+                        "\nSpecific job folder: " + jp.getSpecificJobFolder() +
                         "\nReal finished time: " + jp.getRealFinishedTime() +
                         "\nCommand: " + jp.getFileToExecute() + " " + jp.getArguments() +
                         "\nJob ID in chord (before sha-1): " + jp.getDataIdentifier() +

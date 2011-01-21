@@ -32,11 +32,11 @@ public class JobPackage implements Serializable{
      * <subjob step=1 instance=1 name=>./acqua param1 param2</subjob>
      */
 
+    public static final String STD_LOCATION_ZIPS = "./jobs/";
     public static final String STATUS_WAITING =   "status-waiting";
     public static final String STATUS_EXECUTING = "status-executing";
     public static final String STATUS_DONE =      "status-completely-done";
     public static final int GENERAL_JOB_STEP = -1;
-    public static final int PARTICULAR_SUBJOB_STEP = -2;
     private int jobInstance = 0; /* Hermano en la misma etapa. */
     private int jobStep = 0; /* Etapa 1, etapa 2 en nuestro flow chart. */
     private String zipFileName;
@@ -47,7 +47,7 @@ public class JobPackage implements Serializable{
     private String output;
     private String fileToExecute;
     private String arguments; 
-    private String jobFolder;
+    private String specificJobFolder;
     private String generalJobFolder;
     private String realFinishedTime;
     private String auxiliaryData;
@@ -98,38 +98,41 @@ public class JobPackage implements Serializable{
         this.jobStep = jobstep;
 
 
-        String jobfolder;
+        String specfolder;
         if (jobstep == GENERAL_JOB_STEP){
+            specfolder = null;
             this.zipFileName = this.moveJobPacketToStandardLocation(zipfilename);
-            jobfolder = zipFileName+"-folder";
+            String standard_folder = zipFileName+"-folder";
+            
 
-            Unzip uz = new Unzip(zipFileName, jobfolder + File.separator);
+            Unzip uz = new Unzip(zipFileName, standard_folder + File.separator /*generalJobFolder*/);
             uz.unzipIt();
-        }else if(jobstep == PARTICULAR_SUBJOB_STEP){
-            this.zipFileName = this.moveJobPacketToStandardLocation(zipfilename);
-
-            jobfolder = zipFileName + "-" + subJobName;
-            Unzip uz = new Unzip(zipFileName, jobfolder + File.separator);
-            uz.unzipIt();
+            this.jobDescriptorContent = this.getJobDescriptorFromFile(standard_folder + File.separator + "job_descriptor.xml");
         }else{
             this.zipFileName = zipfilename;
-            jobfolder = zipFileName+"-folder";
+            specfolder = zipFileName + "-" + this.getName();
+            this.jobDescriptorContent = null;
         }
+
         generalJobFolder = zipFileName + "-folder";
 
-        this.jobDescriptorContent = this.getJobDescriptorFromFile(jobfolder + File.separator + "job_descriptor.xml");
-
         this.zipFileContent = JobPackage.readFile(zipFileName);
-        this.jobFolder = jobfolder;
+        this.specificJobFolder = specfolder;
 
     }
 
+
+
+    public void downloadToExecute() throws Exception{
+        Unzip uz = new Unzip(zipFileName, specificJobFolder + File.separator);
+        uz.unzipIt();
+    }
 
     public String getGeneralJobFolder(){
         return generalJobFolder; 
     }
-    public String getJobFolder(){
-        return jobFolder; 
+    public String getSpecificJobFolder(){
+        return specificJobFolder;
     }
 
     public String getZipFileName(){
@@ -164,7 +167,7 @@ public class JobPackage implements Serializable{
         File src = new File(filename);
          existing = src.exists();
         // Destination directory
-        File newlocation = new File("./jobs/");
+        File newlocation = new File(STD_LOCATION_ZIPS);
         existing = newlocation.exists();
         if (existing==false){
             if (!newlocation.mkdirs()){
@@ -172,7 +175,7 @@ public class JobPackage implements Serializable{
             }
         }
 
-        newlocation = new File("./jobs/" + src.getName());
+        newlocation = new File(STD_LOCATION_ZIPS + src.getName());
         // Move file to new directory
 //        boolean success = src.renameTo(newlocation);
 //        if (!success) {
