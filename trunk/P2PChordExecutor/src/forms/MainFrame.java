@@ -1,13 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
- * MainFrame.java
- *
- * Created on 03/01/2011, 17:47:47
- */
 
 package forms;
 
@@ -19,20 +9,20 @@ import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.Serializable;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.UIManager;
 
 import main.*;
 
-/**
- *
- * @author Mauricio
- */
 public class MainFrame extends javax.swing.JFrame{
+    private static String DEFAULT_PORT = "8080";
     private ChordImplExtended chord = null;
 
     static{
@@ -42,14 +32,25 @@ public class MainFrame extends javax.swing.JFrame{
             e.printStackTrace();
         }
    }
-   
+
+
+    private void initMyComponents(){
+        try {
+            InetAddress thisIp = InetAddress.getLocalHost();
+            this.localPortTextField.setText(thisIp.getHostAddress() + ":" + DEFAULT_PORT);
+        }catch(Exception e){
+            System.err.println("Error getting the local IP address: \n" + e.getMessage());
+        }
+
+    }
     /** Creates new form MainFrame */
     public MainFrame() {
 
     
         initComponents();
         PropertiesLoader.loadPropertyFile();
-        setStatusLabel("");
+
+        initMyComponents();
         /* Look & Feels. */
         setDebugButtonsVisibility(false);
         this.setLocation((                      /* Put the window in the center of the screeen. */
@@ -93,11 +94,10 @@ public class MainFrame extends javax.swing.JFrame{
         debugKeyLabel = new javax.swing.JLabel();
         debuGvalueLabel = new javax.swing.JLabel();
         debuGvalueTextField = new javax.swing.JTextField();
-        statusLable = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         debuGreportTextArea = new javax.swing.JTextArea();
         showDebugButton = new javax.swing.JToggleButton();
-        jLabel3 = new javax.swing.JLabel();
+        statusLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Chord's Job Executor");
@@ -166,8 +166,6 @@ public class MainFrame extends javax.swing.JFrame{
 
         debuGvalueTextField.setText("value");
 
-        statusLable.setText(".");
-
         debuGreportTextArea.setBackground(new java.awt.Color(0, 0, 0));
         debuGreportTextArea.setColumns(20);
         debuGreportTextArea.setForeground(new java.awt.Color(255, 255, 255));
@@ -185,7 +183,7 @@ public class MainFrame extends javax.swing.JFrame{
             }
         });
 
-        jLabel3.setText("M. Jost - S. Mazumdar - Prof. L. Liquori - P2P - Ubinet - Polytech'Nice - 2011");
+        statusLabel.setText("M. Jost - S. Mazumdar - Prof. L. Liquori - P2P - Ubinet - Polytech'Nice - 2011");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -205,11 +203,8 @@ public class MainFrame extends javax.swing.JFrame{
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                                     .addComponent(bootstrapTextField, javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(localPortTextField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 317, Short.MAX_VALUE)))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel3)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(statusLable, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(30, 30, 30)
+                            .addComponent(statusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 416, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(23, 23, 23)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addComponent(connectButton, javax.swing.GroupLayout.DEFAULT_SIZE, 92, Short.MAX_VALUE)
                             .addComponent(initButton, javax.swing.GroupLayout.DEFAULT_SIZE, 92, Short.MAX_VALUE)
@@ -246,9 +241,7 @@ public class MainFrame extends javax.swing.JFrame{
                     .addComponent(showDebugButton, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(2, 2, 2)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(statusLable, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel3))))
+                        .addComponent(statusLabel)))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -277,8 +270,10 @@ public class MainFrame extends javax.swing.JFrame{
         String protocol = URL.KNOWN_PROTOCOLS.get(URL.SOCKET_PROTOCOL);
 
         URL localURL = null;
-        String port = this.localPortTextField.getText();
+        
         try {
+            String port = formatIPAddress(this.localPortTextField.getText());
+            System.out.println(port);
             localURL = new URL( protocol + "://"+port+"/");
         
             chord = new ChordImplExtended();
@@ -287,8 +282,9 @@ public class MainFrame extends javax.swing.JFrame{
             this.connectionToChordInstanceDone();
             continueToNextScreen();
         } catch ( Exception e) {
+            this.setStatusLabel(e.getMessage());
+            e.printStackTrace();
             chord.leave();
-            this.setStatusLabel("Chord creation failed.");
         }
 
         
@@ -308,16 +304,17 @@ public class MainFrame extends javax.swing.JFrame{
 
         String protocol = URL.KNOWN_PROTOCOLS.get(URL.SOCKET_PROTOCOL);
 
-        String port = this.localPortTextField.getText();
+        
         URL localURL = null;
         try {
+            String port = formatIPAddress(this.localPortTextField.getText());
             localURL = new URL( protocol + "://"+port+"/");
         
             chord = new ChordImplExtended();
             chord.setURL(localURL);
 
             URL bootstrapURL = null;
-            String bootstrapString = this.bootstrapTextField.getText();
+            String bootstrapString = formatIPAddress(this.bootstrapTextField.getText());
         
             bootstrapURL = new URL( protocol + "://" + bootstrapString + "/");
         
@@ -325,9 +322,9 @@ public class MainFrame extends javax.swing.JFrame{
             this.setStatusLabel("Join done.");
             this.connectionToChordInstanceDone();
             this.continueToNextScreen();
-        } catch (Exception ex) {
-            this.setStatusLabel("Join failed.");
-            ex.printStackTrace();
+        } catch (Exception e) {
+            this.setStatusLabel(e.getMessage());
+            e.printStackTrace();
             chord.leave();
         }
 
@@ -335,10 +332,11 @@ public class MainFrame extends javax.swing.JFrame{
 
 
     public void setStatusLabel(String status){
-        this.statusLable.setText(status);
+        this.statusLabel.setText(status);
     }
 
     public void connectionToChordInstanceDone(){
+
         this.initButton.setEnabled(false);
         this.connectButton.setEnabled(false);
         this.bootstrapTextField.setEnabled(false);
@@ -399,6 +397,45 @@ public class MainFrame extends javax.swing.JFrame{
         
     }//GEN-LAST:event_showDebugButtonActionPerformed
 
+    private String formatIPAddress(String ipaddress) throws Exception{
+
+        String ip = "127.0.0.1";
+        byte[] ipbytes = new byte[4];
+        String port = DEFAULT_PORT;
+
+        Pattern strMatch;
+        Matcher m;
+
+
+
+        strMatch = Pattern.compile("(.*):(.*)");
+        m = strMatch.matcher(ipaddress);
+        if(m.find()){
+            ip = m.group(1);
+            port = m.group(2); 
+        }else{
+            ip = ipaddress; 
+        }
+
+
+        try{
+            strMatch = Pattern.compile("(.*)\\.(.*)\\.(.*)\\.(.*)");
+            m = strMatch.matcher(ip);
+            if(m.find()){
+                for(int i=0; i<4; i++){
+                    ipbytes[i] = (byte)Integer.parseInt(m.group(i+1));
+                }
+            }
+
+        }catch(Exception e){
+            e.printStackTrace();
+            throw new Exception("Cannot interpret IP address ('" + ipaddress + "'). It must have the form xxx.xxx.xxx.xxx[:port].");
+        }
+
+        System.out.println("Using IP: " + ip + ":" + port);
+        return ip + ":" + port;
+    }
+
     private void setDebugButtonsVisibility(boolean b){
         this.debuGinsertButton.setVisible(b);
         this.debuGkeyTextField.setVisible(b);
@@ -434,11 +471,10 @@ public class MainFrame extends javax.swing.JFrame{
     private javax.swing.JButton initButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextField localPortTextField;
     private javax.swing.JToggleButton showDebugButton;
-    private javax.swing.JLabel statusLable;
+    private javax.swing.JLabel statusLabel;
     // End of variables declaration//GEN-END:variables
 
     public void newEvent(int i, Object o) {

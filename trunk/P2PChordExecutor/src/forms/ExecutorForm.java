@@ -379,19 +379,19 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
     private void addJobButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addJobButtonActionPerformed
 
 
-//        final JFileChooser fc = new JFileChooser();
-//        int returnVal = fc.showOpenDialog(this);
-//
-//        if (returnVal == JFileChooser.APPROVE_OPTION) {
-//            File zip = fc.getSelectedFile();
+        final JFileChooser fc = new JFileChooser();
+        int returnVal = fc.showOpenDialog(this);
+
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            File zip = fc.getSelectedFile();
 
 
-            File zip = new File(".\\src\\resources\\job1.zip");
+//            File zip = new File(".\\src\\resources\\job1.zip");
             addJobRequestedHere(zip.getPath());
-//
-//        } else {
-//            outputText.setText("Action cancelled by the user.");
-//        }
+
+        } else {
+            outputText.setText("Action cancelled by the user.");
+        }
 
     }//GEN-LAST:event_addJobButtonActionPerformed
 
@@ -405,7 +405,7 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
             addJobDescriptorTree(jdt);
             outputText.setText("File loaded successfully.");
         }catch(Exception e){
-            this.outputText.setText("Error while processing " + zipFileName + ".");
+            this.outputText.setText("Error while processing " + zipFileName + ".\n" + e.getMessage());
             e.printStackTrace();
         }
     }
