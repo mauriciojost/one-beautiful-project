@@ -90,6 +90,14 @@ public class JobPackage implements Serializable{
         return this.arguments;
     }
 
+    private boolean fileHasNotRightFormat(String zipfilename){
+        if (zipfilename.endsWith(".zip")){
+            return false; 
+        }else{
+            return true; 
+        }
+    
+    }
 
     public JobPackage(String jobname, String subjobname, String zipfilename, int instance, int jobstep) throws Exception{
         this.generalJobName = jobname;
@@ -101,6 +109,9 @@ public class JobPackage implements Serializable{
         String specfolder;
         if (jobstep == GENERAL_JOB_STEP){
             specfolder = null;
+            if (fileHasNotRightFormat(zipfilename)){
+                throw new Exception("File " + zipfilename + " is not a right job file.");
+            }
             this.zipFileName = this.moveJobPacketToStandardLocation(zipfilename);
             String standard_folder = zipFileName+"-folder";
             
