@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -96,7 +98,8 @@ public class JobDependencesTree extends Thread{
             if (lastzip!=null){
                 jp.setZipFileContent(lastzip);
             }
-            chord.insertJobPackage(jp, JobPackage.STATUS_WAITING);
+            jp.setStatus(JobPackage.STATUS_WAITING);
+            chord.insertJobPackage(jp);
             jobsEventsListener.addJobRequestedHereEvent(new JobEvent(jp, "sent to chord", Calendar.getInstance().getTime()));
         }
     }
@@ -111,12 +114,14 @@ public class JobDependencesTree extends Thread{
             while(i.hasNext()){
                 JobPackage jp = i.next();
                 System.out.print("Checking for job '" + jp.getName() + "' of substep '" + jp.getJobStep() + "'...");
-                String status = (String)JobPackage.getLastStatus(chord.retrieveSet(new MyKey(jp.getStatusIdentifier())));
-                if (!status.equals(JobPackage.STATUS_DONE)){
+                //String status = (String)JobPackage.getLastStatus(chord.retrieveSet(new MyKey(jp.getStatusIdentifier())));
+                JobPackage retrieved = (JobPackage)chord.retrieveOneRandom(new MyKey(jp.getDataIdentifier(JobPackage.STATUS_DONE)));
+                
+                if (retrieved==null){
                     not_finished_jobs++; /* At least one has not finished yet. */
                     System.out.println("Not ready...");
                 }else{
-                    System.out.println("Ready!!!");
+                    System.out.println("Ready!!! Status of the job (should be DONE): " + retrieved.getStatus());
                     if (jp.getAuxiliaryData()==null){
                         this.jobsEventsListener.addJobRequestedHereEvent(new JobEvent(jp, "notified finished", Calendar.getInstance().getTime()));
                         jp.setAuxiliaryData("Already notified change");
@@ -143,7 +148,7 @@ public class JobDependencesTree extends Thread{
         System.out.println("Once done these step's jobs, they will be deleted...");
         while(i.hasNext()){
             JobPackage oldjp = i.next();
-            JobPackage newjp = (JobPackage) JobPackage.getLastJobPackage(chord.retrieveSet(new MyKey(oldjp.getDataIdentifier())));
+            JobPackage newjp = (JobPackage) chord.retrieveOneRandom(new MyKey(oldjp.getDataIdentifier(JobPackage.STATUS_DONE)));
             procesed_jobs.add(newjp);
             
             finishedJobs.put(newjp.getName(), newjp);

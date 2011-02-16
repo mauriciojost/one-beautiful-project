@@ -1,18 +1,28 @@
 package forms;
 
 import de.uniba.wiai.lspi.chord.data.ID;
-import java.awt.Toolkit;
+import de.uniba.wiai.lspi.chord.data.URL;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JTable;
+
+
+
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
+import javax.swing.ImageIcon;
+
+
 
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
@@ -62,19 +72,30 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                closeApplication();
+                leaveChord();
             }
         });
     }
 
 
-    public void closeApplication(){
+    private void leaveChord(){
         if (chord!=null)
             System.out.println("Leaving the chord...");
-            chord.leave();
+            try{
+                chord.leave();
+            }catch(Exception e){
+                System.err.println("Error while trying to leave the chord.");
+            }
     }
 
     private void initMyComponents(){
+
+        /* Icon of the frame. */
+        java.net.URL b = getClass().getResource("/resources/icon.gif");
+        Image a = new ImageIcon(b).getImage();
+        this.setIconImage(a);
+
+
         setLocallyRequestedJobsTableCell("Name", -1, this.PROCESS_NAME);
         //setLocallyRequestedJobsTableCell("Status", -1, this.PROCESS_STATUS);
         jobs = new ArrayList<JobDependencesTree>();
@@ -82,6 +103,16 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
         jobsRequestedHereEvents = new ArrayList<JobEvent>();
 
         String[] columnNames = {"Job", "Event", "Time"};
+
+
+        DefaultTableModel model1 = new DefaultTableModel((Object[])columnNames, 2000){
+            @Override
+            public boolean isCellEditable(int rowIndex, int colIndex) {
+                return false;   //Disallow the editing of any cell
+            }
+        };
+
+        locallyExecutedJobsTable.setModel(model1);
 
         DefaultTableModel model = new DefaultTableModel((Object[])columnNames, 2000){
             @Override
@@ -92,7 +123,7 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
 
         requestedJobsTable.setModel(model);
         //listMod.addListSelectionListener(this);
-        locallyExecutedJobsTable.setModel(model);
+        
 
         requestedJobsTable.addMouseListener(this);
 
@@ -142,33 +173,35 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
             if (this.isExecutable(value)){
                 JobPackage job = (JobPackage)value;
                 if (chord.itBelongsToMe(currentID)){
-                    System.out.println("\tI have found one job that is mine! (a non status): " + job.getDataIdentifier() + "-" + job.getName());
-                    MyKey status_key = new MyKey((String)job.getStatusIdentifier());
-                    Serializable status = JobPackage.getLastStatus(chord.retrieveSet(status_key));
-                    System.out.println("\tIts status of execution is: " + (String)status);
-                    if (JobPackage.STATUS_WAITING.equals(status)){
-                        System.out.println("\tChanging status...\n");
-                        chord.remove(status_key, status);
-                        chord.insert(status_key, JobPackage.STATUS_EXECUTING);
+                    System.out.println("\tI have found one job that is mine! (a non status): " + job.getDataIdentifier(job.getStatus()));
+                    //Serializable status = JobPackage.getLastStatus(chord.retrieveSet(status_key));
+                    System.out.println("\tIts status of execution is: " + (String)job.getStatus());
+                    if (JobPackage.STATUS_WAITING.equals(job.getStatus())){
+                        System.out.println("\tStatus waiting. Already executed?\n");
+                        JobPackage done = (JobPackage)chord.retrieveOneRandom(new MyKey(job.getDataIdentifier(JobPackage.STATUS_DONE)));
+                        if (done==null){ /* This was not executed yet. Execute it! */
+                            //chord.remove(status_key, status);
+                            //chord.insert(status_key, JobPackage.STATUS_EXECUTING);
 
-                        chord.remove(new MyKey(job.getDataIdentifier()), job);
+                            chord.removeJobPackage(job);
 
-                        this.addEventToForeignJobsExecutedHere(new JobEvent(job, "started", Calendar.getInstance().getTime()));
+                            this.addEventToForeignJobsExecutedHere(new JobEvent(job, "started", Calendar.getInstance().getTime()));
 
-                        try{
-                            job = executeTask(job);
+                            try{
+                                job = executeTask(job);
+                                System.out.println("Output of the job: \n" + job.getOutput());
+                            }catch(Exception e){
+                                e.printStackTrace();
+                            }
                             System.out.println("Output of the job: \n" + job.getOutput());
-                        }catch(Exception e){
-                            e.printStackTrace();
-                        }
-                        System.out.println("Output of the job: \n" + job.getOutput());
-                        this.addEventToForeignJobsExecutedHere(
-                                new JobEvent(job, "finished", Calendar.getInstance().getTime()));
-                        
+                            this.addEventToForeignJobsExecutedHere(
+                                    new JobEvent(job, "finished", Calendar.getInstance().getTime()));
 
-                        chord.insert(new MyKey(job.getDataIdentifier()), job);
-                        chord.remove(status_key, status);
-                        chord.insert(status_key, JobPackage.STATUS_DONE);
+                            job.setStatus(JobPackage.STATUS_DONE);
+                            chord.insertJobPackage(job);
+                            //chord.remove(status_key, status);
+                            //chord.insert(status_key, JobPackage.STATUS_DONE);
+                        }
                     }
                 }
             }
@@ -506,8 +539,7 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
                         "\nSpecific job folder: " + jp.getSpecificJobFolder() +
                         "\nReal finished time: " + jp.getRealFinishedTime() +
                         "\nCommand: " + jp.getFileToExecute() + " " + jp.getArguments() +
-                        "\nJob ID in chord (before sha-1): " + jp.getDataIdentifier() +
-                        "\nStatus ID in chord (before sha-1): " + jp.getStatusIdentifier() +
+                        "\nJob ID in chord (before sha-1): " + jp.getDataIdentifier(" ") +
                         "\n\nOutput:\n" + jp.getOutput()
                         
                         );

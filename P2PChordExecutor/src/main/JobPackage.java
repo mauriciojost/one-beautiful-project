@@ -37,10 +37,13 @@ public class JobPackage implements Serializable{
      */
 
     public static final String STD_LOCATION_ZIPS = "./jobs/";
-    public static final String STATUS_WAITING =   "status-waiting"; /* Set of possible status. */
-    public static final String STATUS_EXECUTING = "status-executing";
-    public static final String STATUS_DONE =      "status-completely-done";
+    public static final String STATUS_WAITING =   "waiting"; /* Set of possible status. */
+    public static final String STATUS_EXECUTING = "executing";
+    public static final String STATUS_DONE =      "done";
     public static final int GENERAL_JOB_STEP = -1;
+
+    private String status = STATUS_WAITING;
+
     private int jobStep = 0; /* Number of step in the workflow. */
     private int jobInstance = 0; /* Number of sibling in the same step. */
     
@@ -61,6 +64,14 @@ public class JobPackage implements Serializable{
     private String generalJobFolder;
     
     private String auxiliaryData;
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
     public String getAuxiliaryData() {
         return auxiliaryData;
@@ -196,6 +207,7 @@ public class JobPackage implements Serializable{
         }
 
         String name = "";
+        name = name + Calendar.getInstance().getTime().getHours();
         name = name + Calendar.getInstance().getTime().getMinutes();
         name = name + Calendar.getInstance().getTime().getSeconds();
         newlocation = new File(STD_LOCATION_ZIPS + name + src.getName());
@@ -249,14 +261,14 @@ public class JobPackage implements Serializable{
     }
 
     /* Return the ID that should be used to get the DATA of this subjob from the chord. */
-    public String getDataIdentifier(){
-        return this.toString() + "-job";
+    public String getDataIdentifier(String status){
+        return this.getName() + "-" + status;
     }
 
     /* Return the ID that should be used to get the STATUS of this subjob from the chord. */
-    public String getStatusIdentifier(){
+    /*public String getStatusIdentifier(){
         return this.getDataIdentifier() + "-status";
-    }
+    }*/
 
     public void setOutput(String output){
         this.output = output;
@@ -338,40 +350,6 @@ public class JobPackage implements Serializable{
         FileOutputStream fos = new FileOutputStream(newFile);
         fos.write(this.getFileContent(), 0, this.getFileContent().length);
         fos.close();
-    }
-
-    /* From a given set of jobs obtained from the chord
-     (in the openchord implementation one can have several values in the same key, not really intelligent)
-     we must get the one that was executed.
-     */
-    public static JobPackage getLastJobPackage(Set<Serializable> jobs){
-        Iterator<Serializable> i = jobs.iterator();
-        JobPackage last = null;
-        while(i.hasNext()){
-            JobPackage job = (JobPackage)i.next();
-            if (last==null){
-                last = job;
-            }else if(last.getRealFinishedTime()==null && job.getRealFinishedTime()!=null){
-                last = job;
-            }
-
-        }
-
-        return last; 
-    }
-
-    /* Same here. We use the length of the messages to know which one is younger. */
-    public static String getLastStatus(Set<Serializable> statuses){
-        Iterator<Serializable> i = statuses.iterator();
-        String last = null;
-        while(i.hasNext()){
-            String st = (String)i.next();
-            if ((last==null) || (st.length()>last.length())){
-                last = st;
-            }
-        }
-
-        return last;
     }
 
 
