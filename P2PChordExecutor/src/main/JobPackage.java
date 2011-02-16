@@ -38,7 +38,6 @@ public class JobPackage implements Serializable{
 
     public static final String STD_LOCATION_ZIPS = "./jobs/";
     public static final String STATUS_WAITING =   "waiting"; /* Set of possible status. */
-    public static final String STATUS_EXECUTING = "executing";
     public static final String STATUS_DONE =      "done";
     public static final int GENERAL_JOB_STEP = -1;
 
@@ -64,6 +63,28 @@ public class JobPackage implements Serializable{
     private String generalJobFolder;
     
     private String auxiliaryData;
+    private String ifCondition = "";
+
+    public String getIfCondition() {
+        return ifCondition;
+    }
+
+    public void setIfCondition(String ifCondition) {
+        this.ifCondition = ifCondition;
+    }
+
+    public boolean satisfiesIfCondition(){
+        if (ifCondition.equals("") || (this.jobStep==0)){
+            System.out.println("IF: No condition to check or step=0.");
+            return true;
+        }else{
+            File file = new File(this.generalJobFolder + File.separator + this.ifCondition);
+            System.out.println("IF: Checking whether " + file.getPath() + " exists or not: " + file.exists());
+            return file.exists();
+        
+            
+        }
+    }
 
     public String getStatus() {
         return status;
