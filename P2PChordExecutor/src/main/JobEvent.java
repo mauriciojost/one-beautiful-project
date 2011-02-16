@@ -1,15 +1,8 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package main;
-
 import java.util.Date;
 
-/**
- *
- * @author Mauricio
+/* Class to pass information about the event related to a subjob:
+   when it was executed, its name, etc.
  */
 public class JobEvent {
     private JobPackage job;

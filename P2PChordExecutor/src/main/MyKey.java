@@ -1,6 +1,7 @@
 package main;
 
 import de.uniba.wiai.lspi.chord.service.*;
+/* Implementation of Key. */
 public class MyKey implements Key{
     private String key;
     

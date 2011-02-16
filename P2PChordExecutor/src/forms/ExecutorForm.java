@@ -1,27 +1,16 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
- * ExecutorForm.java
- *
- * Created on 06/01/2011, 21:14:32
- */
-
 package forms;
 
 import de.uniba.wiai.lspi.chord.data.ID;
 import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JTable;
 
@@ -57,10 +46,9 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
         }
    }
 
-    /** Creates new form ExecutorForm */
+    /* Creates new form ExecutorForm */
     public ExecutorForm(ChordImplExtended ch) {
         chord = ch;
-        //chord.getEntries().setEventListener(this);
         initComponents();
         this.setLocation((                      /* Put the window in the center of the screeen. */
             Toolkit.getDefaultToolkit().getScreenSize().
@@ -69,8 +57,22 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
             height-this.getSize().height)/2);
         initMyComponents();
         initSystem();
+
+
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                closeApplication();
+            }
+        });
     }
 
+
+    public void closeApplication(){
+        if (chord!=null)
+            System.out.println("Leaving the chord...");
+            chord.leave();
+    }
 
     private void initMyComponents(){
         setLocallyRequestedJobsTableCell("Name", -1, this.PROCESS_NAME);
@@ -80,11 +82,8 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
         jobsRequestedHereEvents = new ArrayList<JobEvent>();
 
         String[] columnNames = {"Job", "Event", "Time"};
-        locallyExecutedJobsTable.setModel(
-                new javax.swing.table.DefaultTableModel((Object[])columnNames, 200));
 
-
-        DefaultTableModel model = new DefaultTableModel((Object[])columnNames, 200){
+        DefaultTableModel model = new DefaultTableModel((Object[])columnNames, 2000){
             @Override
             public boolean isCellEditable(int rowIndex, int colIndex) {
                 return false;   //Disallow the editing of any cell
@@ -93,10 +92,9 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
 
         requestedJobsTable.setModel(model);
         //listMod.addListSelectionListener(this);
+        locallyExecutedJobsTable.setModel(model);
 
         requestedJobsTable.addMouseListener(this);
-
-        
 
     }
 
@@ -105,6 +103,8 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
         foreignJobssExecutedHere.add(je);
         this.refreshForeignJobsExecutedHereTable();
     }
+
+    /* Start checking for local jobs to be executed. */
     private void initSystem(){
         
         Thread t = new Thread(new Runnable(){
@@ -116,6 +116,7 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
                         checkForPendingTasks(ids);
                         refreshForeignJobsExecutedHereTable();
                     }catch(Exception e){
+                        System.err.println("Error while executing remote jobs here.");
                         e.printStackTrace();
                     }
                 }
@@ -175,34 +176,31 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
         
     }
 
+    /* Execute the given subjob. */
     private JobPackage executeTask(JobPackage jporiginal) throws Exception{
 
         JobPackage processed=null;
 
-        jporiginal.downloadZipFile();
+        jporiginal.downloadZipFile(); /* Download from embeded zip content to filesystem/harddisk. */
 
-        jporiginal.downloadToExecute();
+        jporiginal.downloadToExecute(); /* Put in the right place to execute. */
 
-        /*JobPackage jpmaterial = new JobPackage(jporiginal.getGeneralJobName(),
-                jporiginal.getName(),
-                jporiginal.getZipFileName(),
-                0,
-                JobPackage.PARTICULAR_SUBJOB_STEP);
-          */
-        String output = JobPackage.execute(jporiginal/*material*/.getSpecificJobFolder(),
+        /* Execute the right command for this subjob. */
+        String output = JobPackage.execute(jporiginal.getSpecificJobFolder(),
                 jporiginal.getFileToExecute(),
                 jporiginal.getArguments());
 
 
-        Zip comp = new Zip(/*jpmaterial*/jporiginal.getSpecificJobFolder(), /*jpmaterial*/jporiginal.getZipFileName());
+        /* Zip the results, including new generated files. */
+        Zip comp = new Zip(jporiginal.getSpecificJobFolder(), jporiginal.getZipFileName());
         comp.zip();
 
+        /* Set the new fields for this subjob to tell them to the requestor. */
         jporiginal.setZipFileContent(JobPackage.readFile(/*jpmaterial*/jporiginal.getZipFileName()));
         jporiginal.setOutput(output);
         jporiginal.setRealFinishedTime(Calendar.getInstance().getTime().toString());
 
         processed = jporiginal;
-        //put_content_in_jpvirtual_again;
         
         return processed;
         
@@ -382,15 +380,11 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
 
     private void addJobButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addJobButtonActionPerformed
 
-
         final JFileChooser fc = new JFileChooser();
         int returnVal = fc.showOpenDialog(this);
 
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File zip = fc.getSelectedFile();
-
-
-//            File zip = new File(".\\src\\resources\\job1.zip");
             addJobRequestedHere(zip.getPath());
 
         } else {
@@ -400,9 +394,6 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
     }//GEN-LAST:event_addJobButtonActionPerformed
 
     private void addJobRequestedHere(String zipFileName){
-        //jobsRequestedHere.add(jp);
-//        chord.insert(new MyKey(jp.getDataIdentifier()), jp);
-//        chord.insert(new MyKey(jp.getStatusIdentifier()), this.STATUS_WAITING);
         try{
             JobDependencesTree jdt = new JobDependencesTree(zipFileName);
             jdt.startJob(this, chord);
@@ -517,7 +508,7 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
                         "\nCommand: " + jp.getFileToExecute() + " " + jp.getArguments() +
                         "\nJob ID in chord (before sha-1): " + jp.getDataIdentifier() +
                         "\nStatus ID in chord (before sha-1): " + jp.getStatusIdentifier() +
-                        "\nOutput:\n" + jp.getOutput()
+                        "\n\nOutput:\n" + jp.getOutput()
                         
                         );
                 if (e.getClickCount() >= 2){

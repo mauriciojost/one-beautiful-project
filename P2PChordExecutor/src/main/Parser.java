@@ -12,6 +12,12 @@ import java.util.regex.Pattern;
 
 
 /*
+Parser of the console output of the openchord implementation, to
+know which keys/values are in our current node, eventually they could be
+jobs that are waiting to be executed here.
+ */
+
+/*
 Entries:
   key = 71 06 95 17 , value = [( key = 71 06 95 17 , value = value12)]
   key = A6 2F 22 25 , value = [( key = A6 2F 22 25 , value = value1213), ( key = A6 2F 22 25 , value = value)]
@@ -62,6 +68,7 @@ public class Parser {
         return values;
     }
 
+    /* Testing. */
     public static void main (String[] args){
         String str = "Entries:\n  key = 71 06 95 17 , value = [( key = 71 06 95 17 , value = value12)]\n  key = A6 2F 22 25 , value = [( key = A6 2F 22 25 , value = value1213), ( key = A6 2F 22 25 , value = value)]";
         Parser p = new Parser();

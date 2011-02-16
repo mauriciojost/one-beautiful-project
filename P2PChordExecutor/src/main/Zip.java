@@ -1,13 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package main;
 
 import java.io.*;
 import java.util.zip.*;
 
+/* Class to compres a given folder into a zip file. */
 public class Zip
 {
     private File inFolder;
