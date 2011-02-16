@@ -118,7 +118,7 @@
   <SubComponents>
     <Component class="javax.swing.JTextField" name="bootstrapTextField">
       <Properties>
-        <Property name="text" type="java.lang.String" value="localhost:8080"/>
+        <Property name="text" type="java.lang.String" value="localhost"/>
         <Property name="toolTipText" type="java.lang.String" value="Bootstrap Chord Executor to use to connect to an existing Chord of Executors. "/>
       </Properties>
       <Events>
@@ -127,7 +127,7 @@
     </Component>
     <Component class="javax.swing.JTextField" name="localPortTextField">
       <Properties>
-        <Property name="text" type="java.lang.String" value="localhost:8080"/>
+        <Property name="text" type="java.lang.String" value="localhost"/>
         <Property name="toolTipText" type="java.lang.String" value="Local port which other Chord Executors will connect to. "/>
       </Properties>
       <Events>

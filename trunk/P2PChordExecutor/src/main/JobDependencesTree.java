@@ -8,22 +8,20 @@ import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/*
+ Class that represents a general job.
+ A general job has a workflow, a xml descriptor file.
+ Once it is executed, all its subjobs will be executed in order. Once they are
+ executed they will emit events. 
+ */
 public class JobDependencesTree extends Thread{
 
-
-/*
- * Es el unico de step 1
- * Cuantos hay de step 2?
- * Dame todos los JobPackages de step 2
- */
-    private String jobDescriptorContent;
+    private String jobDescriptorContent; /* Content of the XML job descriptor file. */
     private String zipFileName;
-    private ArrayList<JobPackage> subJobsList;
+    private ArrayList<JobPackage> subJobsList;  /* Set of subjobs.*/
     private HashMap<String, JobPackage> finishedJobs;
     private ChordImplExtended chord;
-    private JobsEventsListener jobsEventsListener;
-
-
+    private JobsEventsListener jobsEventsListener;  /* Listener of the events of this general job. */
 
     public JobDependencesTree (String zipFileName) throws Exception{
         JobPackage jp = new JobPackage("main", "main", zipFileName, 0, JobPackage.GENERAL_JOB_STEP);
@@ -37,6 +35,7 @@ public class JobDependencesTree extends Thread{
         return finishedJobs.get(name);
     }
 
+     /* It starts executing the job (all its subjobs step by step) on the chord. */
     public void startJob(JobsEventsListener jobsEventsListener, ChordImplExtended chord){
         this.chord = chord;
         this.jobsEventsListener = jobsEventsListener;
@@ -69,7 +68,7 @@ public class JobDependencesTree extends Thread{
         while(i.hasNext()){
             jp = i.next();
             try {
-                /* Decompres each instance in <place><instance>\... and then put them all together. Then delete those created directories. */
+                /* Decompress each instance in <place><instance>\... and then put them all together. Then delete those created directories. */
                 jp.downloadZipFile();
                 Unzip u = new Unzip(jp.getZipFileName(), jp.getGeneralJobFolder());
                 u.unzipIt();
