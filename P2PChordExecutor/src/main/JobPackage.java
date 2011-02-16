@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Level;
@@ -115,7 +116,6 @@ public class JobPackage implements Serializable{
             this.zipFileName = this.moveJobPacketToStandardLocation(zipfilename);
             String standard_folder = zipFileName+"-folder";
             
-
             Unzip uz = new Unzip(zipFileName, standard_folder + File.separator /*generalJobFolder*/);
             uz.unzipIt();
             this.jobDescriptorContent = this.getJobDescriptorFromFile(standard_folder + File.separator + "job_descriptor.xml");
@@ -186,7 +186,10 @@ public class JobPackage implements Serializable{
             }
         }
 
-        newlocation = new File(STD_LOCATION_ZIPS + src.getName());
+        String name = "";
+        name = name + Calendar.getInstance().getTime().getMinutes();
+        name = name + Calendar.getInstance().getTime().getSeconds();
+        newlocation = new File(STD_LOCATION_ZIPS + name + src.getName());
         // Move file to new directory
 //        boolean success = src.renameTo(newlocation);
 //        if (!success) {
@@ -286,7 +289,7 @@ public class JobPackage implements Serializable{
     }
 
 
-    public static String execute(String workingdirectory, String command, String arguments){
+    public static String execute(String workingdirectory, String command, String arguments) throws Exception{
         String output = "";
 
         String line;
@@ -295,25 +298,26 @@ public class JobPackage implements Serializable{
         Process pr = null;
         File myWorking = new File(workingdirectory);
 
-        try{
-            
-            pr = rt.exec(new File(myWorking, command).getAbsolutePath() + " " + arguments, null, myWorking);
-            BufferedReader input =
-                new BufferedReader (new InputStreamReader(pr.getInputStream()));
+        pr = rt.exec(new File(myWorking, command).getAbsolutePath() + " " + arguments, null, myWorking);
+        BufferedReader input =
+            new BufferedReader (new InputStreamReader(pr.getInputStream()));
 
-            while ((line = input.readLine()) != null){
-                output = output + line + "\n";
-            }
-
-            pr.waitFor();
-            input.close();
-
-            pr.destroy();
-        }catch (Exception err){
-            err.printStackTrace();
+        while ((line = input.readLine()) != null){
+            output = output + line + "\n";
         }
-        
+
+        pr.waitFor();
+        input.close();
+
+        pr.destroy();
+
         return output;
+    }
+
+    public static void executeBasic(String command) throws Exception{
+        Runtime rt = Runtime.getRuntime();
+        rt.exec(command);
+
     }
 
     public void downloadZipFile() throws FileNotFoundException, IOException{

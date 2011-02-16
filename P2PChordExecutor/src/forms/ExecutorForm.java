@@ -20,6 +20,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JTable;
 
@@ -151,8 +153,13 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
                         chord.remove(new MyKey(job.getDataIdentifier()), job);
 
                         this.addEventToForeignJobsExecutedHere(new JobEvent(job, "started", Calendar.getInstance().getTime()));
-                        
-                        job = executeTask(job);
+
+                        try{
+                            job = executeTask(job);
+                            System.out.println("Output of the job: \n" + job.getOutput());
+                        }catch(Exception e){
+                            e.printStackTrace();
+                        }
                         System.out.println("Output of the job: \n" + job.getOutput());
                         this.addEventToForeignJobsExecutedHere(
                                 new JobEvent(job, "finished", Calendar.getInstance().getTime()));
@@ -168,38 +175,35 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
         
     }
 
-    private JobPackage executeTask(JobPackage jporiginal){
+    private JobPackage executeTask(JobPackage jporiginal) throws Exception{
 
         JobPackage processed=null;
-        try{
-            jporiginal.downloadZipFile();
 
-            jporiginal.downloadToExecute();
+        jporiginal.downloadZipFile();
 
-            /*JobPackage jpmaterial = new JobPackage(jporiginal.getGeneralJobName(),
-                    jporiginal.getName(),
-                    jporiginal.getZipFileName(),
-                    0,
-                    JobPackage.PARTICULAR_SUBJOB_STEP);
-              */
-            String output = JobPackage.execute(jporiginal/*material*/.getSpecificJobFolder(),
-                    jporiginal.getFileToExecute(),
-                    jporiginal.getArguments());
+        jporiginal.downloadToExecute();
+
+        /*JobPackage jpmaterial = new JobPackage(jporiginal.getGeneralJobName(),
+                jporiginal.getName(),
+                jporiginal.getZipFileName(),
+                0,
+                JobPackage.PARTICULAR_SUBJOB_STEP);
+          */
+        String output = JobPackage.execute(jporiginal/*material*/.getSpecificJobFolder(),
+                jporiginal.getFileToExecute(),
+                jporiginal.getArguments());
 
 
-            Zip comp = new Zip(/*jpmaterial*/jporiginal.getSpecificJobFolder(), /*jpmaterial*/jporiginal.getZipFileName());
-            comp.zip();
+        Zip comp = new Zip(/*jpmaterial*/jporiginal.getSpecificJobFolder(), /*jpmaterial*/jporiginal.getZipFileName());
+        comp.zip();
 
-            jporiginal.setZipFileContent(JobPackage.readFile(/*jpmaterial*/jporiginal.getZipFileName()));
-            jporiginal.setOutput(output);
-            jporiginal.setRealFinishedTime(Calendar.getInstance().getTime().toString());
+        jporiginal.setZipFileContent(JobPackage.readFile(/*jpmaterial*/jporiginal.getZipFileName()));
+        jporiginal.setOutput(output);
+        jporiginal.setRealFinishedTime(Calendar.getInstance().getTime().toString());
 
-            processed = jporiginal;
-            //put_content_in_jpvirtual_again;
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-
+        processed = jporiginal;
+        //put_content_in_jpvirtual_again;
+        
         return processed;
         
     }
@@ -494,7 +498,7 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
 
     @Override
     public void mouseClicked(MouseEvent e){
-        if (e.getClickCount() == 2) {
+        if (e.getClickCount() >= 1) {
             JTable target = (JTable)e.getSource();
             int row = target.getSelectedRow();
             int column = target.getSelectedColumn();
@@ -503,7 +507,7 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
             
             JobPackage jp = getRequestedJobFromName(name);
             if (jp!=null){
-                System.out.println("SubJob asociado!!" + jp.getName());
+                System.out.println("SubJob related: " + jp.getName());
                 outputText.setText(
                         "\nGeneral job name: " + jp.getGeneralJobName() +
                         "\nJob name: " + jp.getName() +
@@ -516,7 +520,15 @@ public class ExecutorForm extends javax.swing.JFrame implements JobsEventsListen
                         "\nOutput:\n" + jp.getOutput()
                         
                         );
+                if (e.getClickCount() >= 2){
+                    try {
+                        JobPackage.executeBasic("explorer " + jp.getGeneralJobFolder());
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
             }
+
 
         }
     }

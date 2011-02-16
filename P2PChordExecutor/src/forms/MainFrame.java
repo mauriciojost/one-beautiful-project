@@ -37,7 +37,9 @@ public class MainFrame extends javax.swing.JFrame{
     private void initMyComponents(){
         try {
             InetAddress thisIp = InetAddress.getLocalHost();
-            this.localPortTextField.setText(thisIp.getHostAddress() + ":" + DEFAULT_PORT);
+            //this.localPortTextField.setText(thisIp.getHostAddress());
+            this.localPortTextField.setText("127.0.0.1:8080");
+            this.bootstrapTextField.setText("127.0.0.1:8080");
         }catch(Exception e){
             System.err.println("Error getting the local IP address: \n" + e.getMessage());
         }
@@ -45,8 +47,6 @@ public class MainFrame extends javax.swing.JFrame{
     }
     /** Creates new form MainFrame */
     public MainFrame() {
-
-    
         initComponents();
         PropertiesLoader.loadPropertyFile();
 
@@ -103,7 +103,7 @@ public class MainFrame extends javax.swing.JFrame{
         setTitle("Chord's Job Executor");
         setResizable(false);
 
-        bootstrapTextField.setText("localhost:8080");
+        bootstrapTextField.setText("localhost");
         bootstrapTextField.setToolTipText("Bootstrap Chord Executor to use to connect to an existing Chord of Executors. ");
         bootstrapTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -111,7 +111,7 @@ public class MainFrame extends javax.swing.JFrame{
             }
         });
 
-        localPortTextField.setText("localhost:8080");
+        localPortTextField.setText("localhost");
         localPortTextField.setToolTipText("Local port which other Chord Executors will connect to. ");
         localPortTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
