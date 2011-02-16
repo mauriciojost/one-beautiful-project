@@ -51,55 +51,51 @@ public class ChordImplExtended extends ChordImpl {
     /* Retrieve one random element from the given keys. */
     public Serializable retrieveOneRandom(MyKey key){
         Set<Serializable> unique = retrieve(key);
-        if (unique.size()>1){
-            System.out.println("Element supposed to have one element had more: " + key.toString());
-        }
-        Iterator<Serializable> i = unique.iterator();
-        while(i.hasNext()){
-            return i.next();
-        }
-        return null;
+        return checkSetRetrieved(unique);
+        
     }
 
 
     /* Retrieve one random element from the given ID. */
     public Serializable retrieveOneRandom(ID id){
         Set<Serializable> unique = retrieve(id);
-        
-        if (unique.size()>1){
-            System.out.println("Element supposed to have one element had more: " + id.toString());
-        }
-        Iterator<Serializable> i = unique.iterator();
-        while(i.hasNext()){
-            return i.next();
-        }
-        return null;
+        return checkSetRetrieved(unique);
     }
 
-    /* Retrieve the whole set for the given key. */
-    public Set<Serializable> retrieveSet(MyKey key){
-        Set<Serializable> unique = retrieve(key);
-        return unique;
-    }
+    private Serializable checkSetRetrieved(Set<Serializable> set){
+        System.err.println("Checking size of set retrieved...");
+        if (set.size()>1){
+            System.err.println("Set with more than one element.");
+            System.err.println("Size: " + set.size());
+            System.err.println("Elements: ");
 
-    /* Retrieve the whole set for the given ID. */
-    public Set<Serializable> retrieveSet(ID id){
-        Set<Serializable> unique = retrieve(id);
-
-        return unique;
+            Iterator<Serializable> it = set.iterator();
+            while(it.hasNext()){
+                JobPackage jp = (JobPackage)it.next();
+                System.err.println("\t" + jp.getDataIdentifier(jp.getStatus()) + " " + jp.getStatus());
+            }
+            System.exit(-1);
+            return null;
+        }else{
+            if (set.size()==1){
+                Object[] oba = set.toArray();
+                return (Serializable)oba[0];
+            }else{
+                return null;
+            }
+        }
     }
 
     /* Insert a job package and its status in the chord. */
-    public void insertJobPackage(JobPackage jp, String status){
-        this.insert(new MyKey(jp.getDataIdentifier()), jp);
-        this.insert(new MyKey(jp.getStatusIdentifier()), status);
+    public void insertJobPackage(JobPackage jp){
+        System.err.println("Inserting " + jp.getDataIdentifier(jp.getStatus()) + " " + jp.getStatus());
+        this.insert(new MyKey(jp.getDataIdentifier(jp.getStatus())), jp);
+        
     }
 
     /* Removes a job package from the chord, and its status. */
     public void removeJobPackage(JobPackage jp){
-        this.remove(new MyKey(jp.getDataIdentifier()), jp);
-        this.remove(new MyKey(jp.getStatusIdentifier()), JobPackage.STATUS_DONE);
-        this.remove(new MyKey(jp.getStatusIdentifier()), JobPackage.STATUS_EXECUTING);
-        this.remove(new MyKey(jp.getStatusIdentifier()), JobPackage.STATUS_WAITING);
+        System.err.println("Removing " + jp.getDataIdentifier(jp.getStatus()) + " " + jp.getStatus());
+        //this.remove(new MyKey(jp.getDataIdentifier(jp.getStatus())), jp);
     }
 }

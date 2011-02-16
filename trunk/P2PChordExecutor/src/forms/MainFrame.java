@@ -4,15 +4,22 @@ package forms;
 
 import de.uniba.wiai.lspi.chord.data.*;
 import de.uniba.wiai.lspi.chord.service.*;
+import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.ImageIcon;
 import javax.swing.UIManager;
 
 import main.*;
@@ -31,13 +38,20 @@ public class MainFrame extends javax.swing.JFrame{
 
 
     private void initMyComponents(){
+
+        /* Icon of the frame. */
+        java.net.URL b = getClass().getResource("/resources/icon.gif");
+        Image a = new ImageIcon(b).getImage();
+        this.setIconImage(a);
+
+
         try {
             InetAddress thisIp = InetAddress.getLocalHost();
             this.localPortTextField.setText(thisIp.getHostAddress());
             this.bootstrapTextField.setText(thisIp.getHostAddress());
 
-            //this.localPortTextField.setText("127.0.0.1:8080");
-            //this.bootstrapTextField.setText("127.0.0.1:8080");
+            this.localPortTextField.setText("127.0.0.1:8080");
+            this.bootstrapTextField.setText("127.0.0.1:8080");
         }catch(Exception e){
             System.err.println("Error getting the local IP address: \n" + e.getMessage());
         }
@@ -46,6 +60,31 @@ public class MainFrame extends javax.swing.JFrame{
     
     /* Creates new form MainFrame */
     public MainFrame() {
+
+
+        Logger logger = Logger.getLogger("jjj");
+        FileHandler fh;
+
+        try {
+
+            // This block configure the logger with handler and formatter
+            fh = new FileHandler("logfile.log", true);
+
+            logger.addHandler(fh);
+            logger.setLevel(Level.ALL);
+            SimpleFormatter formatter = new SimpleFormatter();
+            fh.setFormatter(formatter);
+
+            /* The following statement is used to log any messages */
+            logger.log(Level.INFO,"Initial message");
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+  
+
         initComponents();
         PropertiesLoader.loadPropertyFile();
 
@@ -61,16 +100,20 @@ public class MainFrame extends javax.swing.JFrame{
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                closeApplication();
+                leaveChord();
             }
         });
     }
 
 
-    public void closeApplication(){
+    private void leaveChord(){
         if (chord!=null)
             System.out.println("Leaving the chord...");
-            chord.leave();
+            try{
+                chord.leave();
+            }catch(Exception e){
+                System.err.println("Error while trying to leave the chord.");
+            }
     }
 
     /** This method is called from within the constructor to
@@ -284,7 +327,7 @@ public class MainFrame extends javax.swing.JFrame{
         } catch ( Exception e) {
             this.setStatusLabel(e.getMessage());
             e.printStackTrace();
-            chord.leave();
+            this.leaveChord();
         }
 
         
@@ -325,7 +368,7 @@ public class MainFrame extends javax.swing.JFrame{
         } catch (Exception e) {
             this.setStatusLabel(e.getMessage());
             e.printStackTrace();
-            chord.leave();
+            this.leaveChord();
         }
 
     }//GEN-LAST:event_connectButtonActionPerformed
@@ -425,7 +468,10 @@ public class MainFrame extends javax.swing.JFrame{
                 for(int i=0; i<4; i++){
                     ipbytes[i] = (byte)Integer.parseInt(m.group(i+1));
                 }
+            }else{
+                throw new Exception(); 
             }
+
 
         }catch(Exception e){
             e.printStackTrace();
