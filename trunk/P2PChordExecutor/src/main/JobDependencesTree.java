@@ -55,6 +55,7 @@ public class JobDependencesTree extends Thread{
         for (i=0;i<this.getAmountOfSteps();i++){
             try{
                 ArrayList<JobPackage> subjobs_of_this_step = this.getSubJobsOfStep(i);
+                subjobs_of_this_step = applyConditionalFilter(subjobs_of_this_step);
                 ArrayList<JobPackage> subjobs_of_this_step_finished;
                 addAllTheseSubjobsToTheChord(subjobs_of_this_step, chord, newzip);
                 checkThatThisSubjobsAreDone(i, subjobs_of_this_step, chord);
@@ -173,7 +174,7 @@ public class JobDependencesTree extends Thread{
         jobname = jobname + "_" +Calendar.getInstance().getTime().getSeconds()+
                 Calendar.getInstance().getTime().getMinutes(); 
 
-        strMatch = Pattern.compile("(<subjob step=\"\\d*?\" instance=\"\\d*?\" name=\".*?\" filetoexecute=\".*?\" arguments=\".*?\">)");
+        strMatch = Pattern.compile("(<subjob step=\"\\d*?\" instance=\"\\d*?\" name=\".*?\" filetoexecute=\".*?\" arguments=\".*?\" if=\".*?\">)");
         m = strMatch.matcher(descriptorContent);
         while(m.find()){
             String subjob = m.group(1);
@@ -182,6 +183,18 @@ public class JobDependencesTree extends Thread{
         }
         return subjobs; 
         
+    }
+
+    private ArrayList<JobPackage> applyConditionalFilter(ArrayList<JobPackage> jobs){
+        ArrayList<JobPackage> filtered = new ArrayList<JobPackage>();
+        Iterator<JobPackage> i = jobs.iterator();
+        while(i.hasNext()){
+            JobPackage sj = i.next();
+            if (sj.satisfiesIfCondition()){
+                filtered.add(sj);
+            }
+        }
+        return filtered; 
     }
 
     /* Return all the subjobs in the given substep of the workflow. */
@@ -218,7 +231,7 @@ public class JobDependencesTree extends Thread{
          */
         JobPackage sj = null;
 
-        Pattern strMatch = Pattern.compile( "<subjob step=\"(\\d*?)\" instance=\"(\\d*?)\" name=\"(.*?)\" filetoexecute=\"(.*?)\" arguments=\"(.*?)\">");
+        Pattern strMatch = Pattern.compile( "<subjob step=\"(\\d*?)\" instance=\"(\\d*?)\" name=\"(.*?)\" filetoexecute=\"(.*?)\" arguments=\"(.*?)\" if=\"(.*?)\">");
         Matcher m = strMatch.matcher(subjobstr);
         if(m.find()){
             int step = Integer.valueOf(m.group(1));
@@ -226,9 +239,11 @@ public class JobDependencesTree extends Thread{
             String name = m.group(3);
             String filetoexecute = m.group(4);
             String arguments = m.group(5);
+            String iff = m.group(6);
             sj = new JobPackage(general_job_name, name, zipfilename, instance, step);
             sj.setFileToExecute(filetoexecute);
             sj.setArguments(arguments);
+            sj.setIfCondition(iff);
         }
         else{
             System.err.println("Cannot parse as a sub job: " + subjobstr);
