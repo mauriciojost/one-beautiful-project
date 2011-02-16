@@ -4,17 +4,13 @@ package forms;
 
 import de.uniba.wiai.lspi.chord.data.*;
 import de.uniba.wiai.lspi.chord.service.*;
-import de.uniba.wiai.lspi.chord.service.impl.*;
 import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.Serializable;
 import java.net.InetAddress;
-import java.net.MalformedURLException;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.UIManager;
@@ -37,21 +33,24 @@ public class MainFrame extends javax.swing.JFrame{
     private void initMyComponents(){
         try {
             InetAddress thisIp = InetAddress.getLocalHost();
-            //this.localPortTextField.setText(thisIp.getHostAddress());
-            this.localPortTextField.setText("127.0.0.1:8080");
-            this.bootstrapTextField.setText("127.0.0.1:8080");
+            this.localPortTextField.setText(thisIp.getHostAddress());
+            this.bootstrapTextField.setText(thisIp.getHostAddress());
+
+            //this.localPortTextField.setText("127.0.0.1:8080");
+            //this.bootstrapTextField.setText("127.0.0.1:8080");
         }catch(Exception e){
             System.err.println("Error getting the local IP address: \n" + e.getMessage());
         }
 
     }
-    /** Creates new form MainFrame */
+    
+    /* Creates new form MainFrame */
     public MainFrame() {
         initComponents();
         PropertiesLoader.loadPropertyFile();
 
         initMyComponents();
-        /* Look & Feels. */
+        /* Look & Feel. */
         setDebugButtonsVisibility(false);
         this.setLocation((                      /* Put the window in the center of the screeen. */
             Toolkit.getDefaultToolkit().getScreenSize().
@@ -70,6 +69,7 @@ public class MainFrame extends javax.swing.JFrame{
 
     public void closeApplication(){
         if (chord!=null)
+            System.out.println("Leaving the chord...");
             chord.leave();
     }
 

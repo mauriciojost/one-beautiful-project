@@ -13,9 +13,12 @@ import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+/* Class that wraps all the necessary things to run a subjob in a remote machine.
+   As most important things it contains the zipfile inside, the name of the job,
+   the command to be executed for this particular subjob, all the output files of the
+   previous steps, once executed it will contain the output of the execution, the time, etc.
+ */
 public class JobPackage implements Serializable{
 
     /*
@@ -34,23 +37,29 @@ public class JobPackage implements Serializable{
      */
 
     public static final String STD_LOCATION_ZIPS = "./jobs/";
-    public static final String STATUS_WAITING =   "status-waiting";
+    public static final String STATUS_WAITING =   "status-waiting"; /* Set of possible status. */
     public static final String STATUS_EXECUTING = "status-executing";
     public static final String STATUS_DONE =      "status-completely-done";
     public static final int GENERAL_JOB_STEP = -1;
-    private int jobInstance = 0; /* Hermano en la misma etapa. */
-    private int jobStep = 0; /* Etapa 1, etapa 2 en nuestro flow chart. */
-    private String zipFileName;
-    private String subJobName;
-    private String generalJobName;
-    private byte[] zipFileContent;
+    private int jobStep = 0; /* Number of step in the workflow. */
+    private int jobInstance = 0; /* Number of sibling in the same step. */
+    
+    private String zipFileName; /* Name of the zip file. */
+    private byte[] zipFileContent; /* CONTENT of the zip file til this step. */
+
+    private String generalJobName; /* Name of the general job. */
+    private String subJobName; /* Name of this particular subjob. */
+    
     private String jobDescriptorContent;
-    private String output;
-    private String fileToExecute;
-    private String arguments; 
-    private String specificJobFolder;
+
+    private String output; /* Output obtained once executed. */
+    private String realFinishedTime; /* Once executed, the real finished time. */
+
+    private String fileToExecute; /* File to execute. */
+    private String arguments; /* Arguments for the execution. */
+    private String specificJobFolder; /* Folders. */
     private String generalJobFolder;
-    private String realFinishedTime;
+    
     private String auxiliaryData;
 
     public String getAuxiliaryData() {
@@ -60,8 +69,6 @@ public class JobPackage implements Serializable{
     public void setAuxiliaryData(String auxiliaryData) {
         this.auxiliaryData = auxiliaryData;
     }
-
-    
 
     public void setRealFinishedTime(String realFinishedTime) {
         this.realFinishedTime = realFinishedTime;
@@ -92,23 +99,23 @@ public class JobPackage implements Serializable{
     }
 
     private boolean fileHasNotRightFormat(String zipfilename){
-        if (zipfilename.endsWith(".zip")){
-            return false; 
-        }else{
-            return true; 
-        }
-    
+        return (!zipfilename.endsWith(".zip"));
     }
 
+    /*  Creates a job package based on the input parameters, including the zip file content. */
     public JobPackage(String jobname, String subjobname, String zipfilename, int instance, int jobstep) throws Exception{
         this.generalJobName = jobname;
         this.subJobName = subjobname;
         this.jobInstance = instance;
         this.jobStep = jobstep;
 
-
         String specfolder;
+        /* The first time, an auxiliary GENERAL_JOB_STEP job will be created. It will not
+           be executed, it is only necessary to get the content of the xml file from here and
+           let the other subjob packages to be initialized (getting the xml file content for instance).
+         */
         if (jobstep == GENERAL_JOB_STEP){
+            /* Particular case for the first time a job zip file is opened to create the tree of subjobs. */
             specfolder = null;
             if (fileHasNotRightFormat(zipfilename)){
                 throw new Exception("File " + zipfilename + " is not a right job file.");
@@ -120,6 +127,7 @@ public class JobPackage implements Serializable{
             uz.unzipIt();
             this.jobDescriptorContent = this.getJobDescriptorFromFile(standard_folder + File.separator + "job_descriptor.xml");
         }else{
+            /* More frequent case where a subjob is created from a line of the xml file. */
             this.zipFileName = zipfilename;
             specfolder = zipFileName + "-" + this.getName();
             this.jobDescriptorContent = null;
@@ -132,8 +140,7 @@ public class JobPackage implements Serializable{
 
     }
 
-
-
+    /* Download the zip content in the right folder and have it ready for execution. */
     public void downloadToExecute() throws Exception{
         Unzip uz = new Unzip(zipFileName, specificJobFolder + File.separator);
         uz.unzipIt();
@@ -150,6 +157,7 @@ public class JobPackage implements Serializable{
         return zipFileName;
     }
 
+    /* Read the content of a file and return it. */
     public static byte[] readFile(String filename) throws Exception{
         byte buff[] = null;
         try {
@@ -172,12 +180,13 @@ public class JobPackage implements Serializable{
         
     }
 
-    public String moveJobPacketToStandardLocation(String filename) throws Exception{
-        // File (or directory) to be moved
+
+    /* Put the zip file in the correct place for job zip files and renames it
+     to give to the execution a particular ID depending on the time it was executed. */
+    public String moveJobPacketToStandardLocation(String zipfilenm) throws Exception{
         boolean existing;
-        File src = new File(filename);
+        File src = new File(zipfilenm);
          existing = src.exists();
-        // Destination directory
         File newlocation = new File(STD_LOCATION_ZIPS);
         existing = newlocation.exists();
         if (existing==false){
@@ -190,11 +199,6 @@ public class JobPackage implements Serializable{
         name = name + Calendar.getInstance().getTime().getMinutes();
         name = name + Calendar.getInstance().getTime().getSeconds();
         newlocation = new File(STD_LOCATION_ZIPS + name + src.getName());
-        // Move file to new directory
-//        boolean success = src.renameTo(newlocation);
-//        if (!success) {
-//            System.err.println("Unable to rename the job.");
-//        }
 
         if (!src.equals(newlocation)){
             this.copyDirectory(src, newlocation);
@@ -244,10 +248,12 @@ public class JobPackage implements Serializable{
         return zipFileName + "-" +  generalJobName + "-" + subJobName + "-" + jobStep + "-" + jobInstance;
     }
 
+    /* Return the ID that should be used to get the DATA of this subjob from the chord. */
     public String getDataIdentifier(){
         return this.toString() + "-job";
     }
 
+    /* Return the ID that should be used to get the STATUS of this subjob from the chord. */
     public String getStatusIdentifier(){
         return this.getDataIdentifier() + "-status";
     }
@@ -289,6 +295,7 @@ public class JobPackage implements Serializable{
     }
 
 
+    /* Executes the process given by arguments and returns the output. */
     public static String execute(String workingdirectory, String command, String arguments) throws Exception{
         String output = "";
 
@@ -314,6 +321,7 @@ public class JobPackage implements Serializable{
         return output;
     }
 
+    /* Execute a process with basic behaviour. */
     public static void executeBasic(String command) throws Exception{
         Runtime rt = Runtime.getRuntime();
         rt.exec(command);
@@ -332,6 +340,10 @@ public class JobPackage implements Serializable{
         fos.close();
     }
 
+    /* From a given set of jobs obtained from the chord
+     (in the openchord implementation one can have several values in the same key, not really intelligent)
+     we must get the one that was executed.
+     */
     public static JobPackage getLastJobPackage(Set<Serializable> jobs){
         Iterator<Serializable> i = jobs.iterator();
         JobPackage last = null;
@@ -348,6 +360,7 @@ public class JobPackage implements Serializable{
         return last; 
     }
 
+    /* Same here. We use the length of the messages to know which one is younger. */
     public static String getLastStatus(Set<Serializable> statuses){
         Iterator<Serializable> i = statuses.iterator();
         String last = null;

@@ -24,9 +24,11 @@ public class JobDependencesTree extends Thread{
     private JobsEventsListener jobsEventsListener;  /* Listener of the events of this general job. */
 
     public JobDependencesTree (String zipFileName) throws Exception{
+        /* Creates a special job package to get the content of the xml file. */
         JobPackage jp = new JobPackage("main", "main", zipFileName, 0, JobPackage.GENERAL_JOB_STEP);
         this.jobDescriptorContent = jp.getJobDescriptorContent();
         this.zipFileName = jp.getPositionedZipFileName();
+        /* Creates the tree of the job packages respecting the workflow. */
         subJobsList = this.generateSubJobsList(jobDescriptorContent);
         finishedJobs = new HashMap<String, JobPackage>();
     }
@@ -41,7 +43,9 @@ public class JobDependencesTree extends Thread{
         this.jobsEventsListener = jobsEventsListener;
         this.start();
     }
-    
+
+
+    /* Execute the job (all the subjobs). */
     @Override
     public void run(){
         int i;
@@ -62,6 +66,7 @@ public class JobDependencesTree extends Thread{
         System.out.println("Finished all the procedures for this job!! ");
     }
 
+    /* Put the results of all the zip files from parallel jobs in the same folder. */
     private byte[] mergeAllResultsOfTheseSubjobs(ArrayList<JobPackage> subjobs_of_this_step_finished) throws Exception{
         Iterator<JobPackage> i = subjobs_of_this_step_finished.iterator();
         JobPackage jp = null;
@@ -83,6 +88,7 @@ public class JobDependencesTree extends Thread{
         return newzip; 
     }
 
+    /* Put all the given subjobs in the cord to execute them parallely. */
     private void addAllTheseSubjobsToTheChord(ArrayList<JobPackage> subjobs_of_this_step, ChordImplExtended chord, byte[] lastzip){
         Iterator<JobPackage> i = subjobs_of_this_step.iterator();
         while(i.hasNext()){
@@ -94,7 +100,8 @@ public class JobDependencesTree extends Thread{
             jobsEventsListener.addJobRequestedHereEvent(new JobEvent(jp, "sent to chord", Calendar.getInstance().getTime()));
         }
     }
-    
+
+    /* Check that are the given subjobs have a 'done' status. */
     private void checkThatThisSubjobsAreDone(int step, ArrayList<JobPackage> subjobs_of_this_step, ChordImplExtended chord){
 
         while(true){ /* Repeat checking if last one went bad. */
@@ -129,6 +136,7 @@ public class JobDependencesTree extends Thread{
         }
     }
 
+    /* Once all subjobs of the step are 'done' get them from the chord and remove all. */
     private ArrayList<JobPackage> getAndDeleteAllTheseSubjobsFromTheChord(ArrayList<JobPackage> subjobs_of_this_step, ChordImplExtended chord){
         ArrayList<JobPackage> procesed_jobs = new ArrayList<JobPackage>();
         Iterator<JobPackage> i = subjobs_of_this_step.iterator(); /* Check for every subjob of this step. */
@@ -146,6 +154,7 @@ public class JobDependencesTree extends Thread{
         return procesed_jobs;
     }
 
+    /* Generate a list of subjobs (jobpackages) from the xml job descriptor file content. */
     private ArrayList<JobPackage> generateSubJobsList(String descriptorContent) throws Exception{
         ArrayList<JobPackage> subjobs = new ArrayList<JobPackage>();
         String jobname = "defaultjobname";
@@ -170,6 +179,7 @@ public class JobDependencesTree extends Thread{
         
     }
 
+    /* Return all the subjobs in the given substep of the workflow. */
     public ArrayList<JobPackage> getSubJobsOfStep(int step){
         ArrayList<JobPackage> instep = new ArrayList<JobPackage>(); 
         Iterator<JobPackage> i = subJobsList.iterator();
@@ -182,6 +192,7 @@ public class JobDependencesTree extends Thread{
         return instep; 
     }
 
+    /* Return the number of steps in the workflow. */
     public int getAmountOfSteps(){
         /* If there is 0,1,2,3 it will return 4.*/
         int max = -1;
@@ -195,6 +206,7 @@ public class JobDependencesTree extends Thread{
         return max+1;
     }
 
+    /* Generate a subjob from the given parameters. Will include the zip file content. */
     private JobPackage generateSubJob(String general_job_name, String subjobstr, String zipfilename) throws Exception{
         /*
         <subjob step=(\d*?) instance=(\d*?) name="(.*?)">(.*?)</subjob>
