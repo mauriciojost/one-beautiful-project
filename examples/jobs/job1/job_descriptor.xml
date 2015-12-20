@@ -1,0 +1,12 @@
+
+<!-- Name of the job. -->
+<job_descriptor job_name="p2pjob">
+	<!-- Workflow. To denote dependance we use steps (two subjobs in the same step can be executed parallelly). -->
+	<!-- Name of each subjob. -->
+	<subjob step="0" instance="0" name="subjobA" filetoexecute="a.bash" arguments="sjobAparam1 sjobAparam2"> 
+	<!-- sjobB and sjobC will be executed in parallel. -->
+	<subjob step="1" instance="0" name="subjobB" filetoexecute="b.bash" arguments="sjobBparam1 sjobBparam2">
+	<subjob step="1" instance="1" name="subjobC" filetoexecute="c.bash" arguments="sjobCparam1 sjobCparam2">
+	<!-- sjobD will way for both before start (and will get all the files they have generated). -->
+	<subjob step="2" instance="0" name="subjobD" filetoexecute="d.bash" arguments="sjobDparam1 sjobDparam2"> 
+</job_descriptor>

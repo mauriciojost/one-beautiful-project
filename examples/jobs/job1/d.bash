@@ -1,7 +1,8 @@
-@echo off
+#!/bin/bash
+
 echo Subjob D started.
-ping 127.0.0.1 -n 25 -w 1000 > nul
-echo File output of subjob D. Parameters of the call were %1 %2. > d.txt
+ping 127.0.0.1 -c 25 
+echo File output of subjob D. Parameters of the call were $1 $2. > d.txt
 echo Taken from B... >> d.txt
 type b.txt >> d.txt
 echo Taken from C... >> d.txt
