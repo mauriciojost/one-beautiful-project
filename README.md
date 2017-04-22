@@ -2,7 +2,7 @@
 
 This is a university project.
 
-Job scheduler based on cord algorithm. 
+Multi-nodes job scheduler based on _cord_ algorithm. 
 
 ## Compile
 
@@ -17,3 +17,4 @@ ant jar
 bash ./run.bash
 ```
 
+**DISCLAIMER**: I am not really proud of it :) 
